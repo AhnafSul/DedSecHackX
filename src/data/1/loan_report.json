@@ -1,0 +1,62 @@
+
+{
+    "loan_repayment_history": {
+      "active_loans": [
+        {
+          "loan_type": "Personal Loan",
+          "issuer": "Axis Bank",
+          "loan_amount": 500000,
+          "outstanding_amount": 120000,
+          "emi_amount": 10500,
+          "tenure_months": 60,
+          "start_date": "2019-01-15",
+          "on_time_payments": 55,
+          "missed_payments": 1,
+          "last_missed_payment_date": "2023-11-01",
+          "prepayment_behavior": {
+            "has_prepayments": true,
+            "total_prepayment_amount": 50000,
+            "last_prepayment_date": "2022-06-10"
+          }
+        },
+        {
+          "loan_type": "Home Loan",
+          "issuer": "SBI",
+          "loan_amount": 2500000,
+          "outstanding_amount": 1800000,
+          "emi_amount": 22000,
+          "tenure_months": 240,
+          "start_date": "2018-06-20",
+          "on_time_payments": 75,
+          "missed_payments": 0,
+          "prepayment_behavior": {
+            "has_prepayments": false,
+            "total_prepayment_amount": 0,
+            "last_prepayment_date": null
+          }
+        }
+      ],
+      "closed_loans": [
+        {
+          "loan_type": "Auto Loan",
+          "issuer": "Bajaj Finance",
+          "loan_amount": 300000,
+          "closed_on": "2022-12-01",
+          "closure_reason": "Loan Fully Paid",
+          "on_time_payments": 48,
+          "missed_payments": 0,
+          "prepayment_behavior": {
+            "has_prepayments": true,
+            "total_prepayment_amount": 30000,
+            "last_prepayment_date": "2021-09-15"
+          }
+        }
+      ],
+      "credit_utilization": {
+        "total_loan_limit": 3300000,
+        "total_outstanding": 1920000,
+        "utilization_ratio": 0.58
+      }
+    }
+  }
+  

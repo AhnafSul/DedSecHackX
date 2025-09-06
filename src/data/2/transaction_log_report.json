@@ -1,0 +1,108 @@
+{
+  "transaction_logs": [
+    {
+      "merchant": "Big Bazaar",
+      "category": "Groceries",
+      "frequency": 8,
+      "total_amount": 2500.0
+    },
+    {
+      "merchant": "Amazon India",
+      "category": "E-commerce",
+      "frequency": 12,
+      "total_amount": 5000.0
+    },
+    {
+      "merchant": "Ola",
+      "category": "Ride-Hailing",
+      "frequency": 15,
+      "total_amount": 2000.0
+    },
+    {
+      "merchant": "Jio",
+      "category": "Telecom",
+      "frequency": 1,
+      "total_amount": 599.0
+    }
+  ],
+  "utility_payments": {
+    "monthly_breakdown": [
+      {
+        "month": "January",
+        "electricity": {
+          "provider": "MSEB",
+          "due_date": "2023-01-10",
+          "payment_date": "2023-01-08",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 800.0
+        },
+        "water": {
+          "provider": "BMC",
+          "due_date": "2023-01-15",
+          "payment_date": "2023-01-14",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 300.0
+        },
+        "internet": {
+          "provider": "Jio Fiber",
+          "due_date": "2023-01-05",
+          "payment_date": "2023-01-05",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 999.0
+        },
+        "mobile": {
+          "provider": "Jio",
+          "due_date": "2023-01-07",
+          "payment_date": "2023-01-07",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 599.0
+        }
+      }
+    ]
+  },
+  "ecommerce_activity": {
+    "platforms": [
+      "Amazon India",
+      "Flipkart"
+    ],
+    "purchases": 12,
+    "refunds": 1,
+    "total_spent": 5000.0,
+    "total_refunded": 500.0
+  },
+  "ride_delivery_usage": {
+    "ride_hailing": {
+      "services": [
+        "Ola"
+      ],
+      "rides": 15,
+      "total_spent": 2000.0
+    },
+    "food_delivery": {
+      "services": [
+        "Swiggy",
+        "Zomato"
+      ],
+      "orders": 8,
+      "total_spent": 1200.0
+    }
+  },
+  "mobile_app_spending": {
+    "telecom_recharge": {
+      "providers": [
+        "Jio"
+      ],
+      "recharges": 1,
+      "total_spent": 599.0
+    },
+    "app_store": {
+      "platform": "Google Play",
+      "purchases": 2,
+      "total_spent": 300.0
+    }
+  }
+}

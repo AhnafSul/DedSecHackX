@@ -1,0 +1,90 @@
+{
+  "transaction_logs": [
+    {
+      "merchant": "Swiggy",
+      "category": "Food Delivery",
+      "frequency": 12,
+      "total_amount": 2400.0
+    },
+    {
+      "merchant": "Myntra",
+      "category": "Fashion",
+      "frequency": 4,
+      "total_amount": 3000.0
+    },
+    {
+      "merchant": "BookMyShow",
+      "category": "Entertainment",
+      "frequency": 3,
+      "total_amount": 900.0
+    },
+    {
+      "merchant": "Uber",
+      "category": "Ride-Hailing",
+      "frequency": 8,
+      "total_amount": 1600.0
+    }
+  ],
+  "utility_payments": {
+    "monthly_breakdown": [
+      {
+        "month": "January",
+        "mobile": {
+          "provider": "Jio",
+          "due_date": "2025-01-05",
+          "payment_date": "2025-01-04",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 399.0
+        },
+        "internet": {
+          "provider": "Airtel Xstream",
+          "due_date": "2025-01-10",
+          "payment_date": "2025-01-09",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 799.0
+        }
+      }
+    ]
+  },
+  "ecommerce_activity": {
+    "platforms": [
+      "Myntra"
+    ],
+    "purchases": 4,
+    "refunds": 1,
+    "total_spent": 3000.0,
+    "total_refunded": 500.0
+  },
+  "ride_delivery_usage": {
+    "ride_hailing": {
+      "services": [
+        "Uber"
+      ],
+      "rides": 8,
+      "total_spent": 1600.0
+    },
+    "food_delivery": {
+      "services": [
+        "Swiggy"
+      ],
+      "orders": 12,
+      "total_spent": 2400.0
+    }
+  },
+  "mobile_app_spending": {
+    "telecom_recharge": {
+      "providers": [
+        "Jio"
+      ],
+      "recharges": 1,
+      "total_spent": 399.0
+    },
+    "app_store": {
+      "platform": "Google Play",
+      "purchases": 5,
+      "total_spent": 900.0
+    }
+  }
+}

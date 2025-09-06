@@ -1,0 +1,75 @@
+{
+  "income_statement": {
+    "salary_slips": {
+      "employer": "TCS Limited",
+      "employment_type": "Permanent",
+      "current_designation": "Senior Software Engineer",
+      "date_of_joining": "2021-09-10",
+      "monthly_income": 150000,
+      "deductions": {
+        "pf": 12000,
+        "tax": 18000,
+        "other": 1500
+      },
+      "net_income": 118500,
+      "last_updated": "2025-08-31"
+    },
+    "business_income": {
+      "is_self_employed": false,
+      "gst_filing_status": "Not Applicable",
+      "monthly_profit": null,
+      "bank_statement_summary": null
+    },
+    "tax_returns": {
+      "itr_filed": true,
+      "financial_year": "2024-2025",
+      "total_taxable_income": 1800000,
+      "tax_paid": 216000,
+      "refund_status": "No Refund",
+      "sources_of_income": [
+        "Salary",
+        "Interest Income",
+        "Capital Gains"
+      ],
+      "section_80c_deductions": {
+        "total_claimed": 150000,
+        "epf_contribution": 144000,
+        "children_tuition_fees": 0,
+        "life_insurance_premium": 6000
+      }
+    },
+    "investment_portfolio": {
+      "mutual_funds": [
+        {
+          "fund_name": "SBI Bluechip Fund",
+          "current_value": 500000,
+          "investment_type": "Equity"
+        }
+      ],
+      "fixed_deposits": [
+        {
+          "bank": "HDFC Bank",
+          "amount": 300000,
+          "maturity_date": "2026-12-15"
+        }
+      ],
+      "stocks": [
+        {
+          "company": "TCS Ltd",
+          "quantity": 100,
+          "current_price": 3200
+        }
+      ],
+      "real_estate_income": {
+        "property_location": "Mumbai",
+        "monthly_rent": 25000,
+        "source": "Bank Statement & ITR",
+        "supporting_documents": [
+          "rental_agreement.pdf",
+          "property_tax_receipt.pdf"
+        ],
+        "confidence_score": 0.95
+      }
+    }
+  }
+}

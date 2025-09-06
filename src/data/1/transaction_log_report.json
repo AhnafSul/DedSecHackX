@@ -1,0 +1,203 @@
+{
+  "transaction_logs": [
+    {
+      "merchant": "Reliance Fresh",
+      "category": "Groceries",
+      "frequency": 12,
+      "total_amount": 9600.0
+    },
+    {
+      "merchant": "Amazon India",
+      "category": "E-commerce",
+      "frequency": 9,
+      "total_amount": 22350.0
+    },
+    {
+      "merchant": "Uber",
+      "category": "Ride-Hailing",
+      "frequency": 6,
+      "total_amount": 1800.0
+    },
+    {
+      "merchant": "Swiggy",
+      "category": "Food Delivery",
+      "frequency": 5,
+      "total_amount": 1550.0
+    },
+    {
+      "merchant": "Airtel",
+      "category": "Telecom",
+      "frequency": 3,
+      "total_amount": 1199.0
+    },
+    {
+      "merchant": "TNEB",
+      "category": "Electricity",
+      "frequency": 3,
+      "total_amount": 3750.0
+    },
+    {
+      "merchant": "Metro Water",
+      "category": "Water",
+      "frequency": 3,
+      "total_amount": 1350.0
+    },
+    {
+      "merchant": "ACT Fibernet",
+      "category": "Internet",
+      "frequency": 3,
+      "total_amount": 3150.0
+    }
+  ],
+  "utility_payments": {
+    "monthly_breakdown": [
+      {
+        "month": "January",
+        "electricity": {
+          "provider": "TNEB",
+          "due_date": "2023-01-10",
+          "payment_date": "2023-01-09",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 1250.0
+        },
+        "water": {
+          "provider": "Metro Water",
+          "due_date": "2023-01-12",
+          "payment_date": "2023-01-15",
+          "delay_days": 3,
+          "missed_payment": false,
+          "amount": 450.0
+        },
+        "internet": {
+          "provider": "ACT Fibernet",
+          "due_date": "2023-01-05",
+          "payment_date": "2023-01-05",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 1050.0
+        },
+        "mobile": {
+          "provider": "Airtel",
+          "due_date": "2023-01-07",
+          "payment_date": "2023-01-10",
+          "delay_days": 3,
+          "missed_payment": false,
+          "amount": 399.0
+        }
+      },
+      {
+        "month": "February",
+        "electricity": {
+          "provider": "TNEB",
+          "due_date": "2023-02-10",
+          "payment_date": "2023-02-12",
+          "delay_days": 2,
+          "missed_payment": false,
+          "amount": 1250.0
+        },
+        "water": {
+          "provider": "Metro Water",
+          "due_date": "2023-02-12",
+          "payment_date": "2023-02-20",
+          "delay_days": 8,
+          "missed_payment": false,
+          "amount": 450.0
+        },
+        "internet": {
+          "provider": "ACT Fibernet",
+          "due_date": "2023-02-05",
+          "payment_date": "2023-02-06",
+          "delay_days": 1,
+          "missed_payment": false,
+          "amount": 1050.0
+        },
+        "mobile": {
+          "provider": "Airtel",
+          "due_date": "2023-02-07",
+          "payment_date": "2023-02-07",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 400.0
+        }
+      },
+      {
+        "month": "March",
+        "electricity": {
+          "provider": "TNEB",
+          "due_date": "2023-03-10",
+          "payment_date": "2023-03-15",
+          "delay_days": 5,
+          "missed_payment": false,
+          "amount": 1250.0
+        },
+        "water": {
+          "provider": "Metro Water",
+          "due_date": "2023-03-12",
+          "payment_date": null,
+          "delay_days": null,
+          "missed_payment": true,
+          "amount": 450.0
+        },
+        "internet": {
+          "provider": "ACT Fibernet",
+          "due_date": "2023-03-05",
+          "payment_date": "2023-03-05",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 1050.0
+        },
+        "mobile": {
+          "provider": "Airtel",
+          "due_date": "2023-03-07",
+          "payment_date": "2023-03-09",
+          "delay_days": 2,
+          "missed_payment": false,
+          "amount": 400.0
+        }
+      }
+    ]
+  },
+  "ecommerce_activity": {
+    "platforms": [
+      "Amazon India",
+      "Flipkart"
+    ],
+    "purchases": 9,
+    "refunds": 2,
+    "total_spent": 22350.0,
+    "total_refunded": 1500.0
+  },
+  "ride_delivery_usage": {
+    "ride_hailing": {
+      "services": [
+        "Uber",
+        "Ola"
+      ],
+      "rides": 6,
+      "total_spent": 1800.0
+    },
+    "food_delivery": {
+      "services": [
+        "Swiggy",
+        "Zomato"
+      ],
+      "orders": 5,
+      "total_spent": 1550.0
+    }
+  },
+  "mobile_app_spending": {
+    "telecom_recharge": {
+      "providers": [
+        "Airtel"
+      ],
+      "recharges": 3,
+      "total_spent": 1199.0
+    },
+    "app_store": {
+      "platform": "Google Play",
+      "purchases": 4,
+      "total_spent": 600.0
+    }
+  }
+}

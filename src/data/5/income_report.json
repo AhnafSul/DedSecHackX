@@ -1,0 +1,42 @@
+{
+  "income_statement": {
+    "salary_slips": {
+      "employer": "Self Employed",
+      "employment_type": "Self Employed",
+      "current_designation": "Business Owner",
+      "date_of_joining": "2022-06-01",
+      "monthly_income": 45000,
+      "deductions": {
+        "pf": 0,
+        "tax": 0,
+        "other": 0
+      },
+      "net_income": 45000,
+      "last_updated": "2025-08-31"
+    },
+    "business_income": {
+      "is_self_employed": true,
+      "gst_filing_status": "Non-compliant",
+      "monthly_profit": 25000,
+      "bank_statement_summary": "Highly irregular cash flows"
+    },
+    "tax_returns": {
+      "itr_filed": false,
+      "financial_year": "2024-2025",
+      "total_taxable_income": null,
+      "tax_paid": null,
+      "refund_status": "Not Filed",
+      "sources_of_income": [
+        "Business Income",
+        "Cash Transactions"
+      ],
+      "section_80c_deductions": null
+    },
+    "investment_portfolio": {
+      "mutual_funds": [],
+      "fixed_deposits": [],
+      "stocks": [],
+      "real_estate_income": null
+    }
+  }
+}

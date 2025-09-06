@@ -1,0 +1,45 @@
+{
+  "personal_info": {
+    "name": "Ananya Patel",
+    "pan": "DEFGH1234I",
+    "aadhar": "4567-8901-2345",
+    "dob": "1998-03-25"
+  },
+  "credit_score": {
+    "score": 650,
+    "rating": "Fair",
+    "last_updated": "2025-09-05"
+  },
+  "credit_cards": [
+    {
+      "issuer": "HDFC Bank",
+      "card_type": "MoneyBack",
+      "limit": 75000,
+      "available_limit": 65000,
+      "utilization_ratio": 0.13,
+      "status": "Active",
+      "opened_on": "2024-11-01"
+    }
+  ],
+  "loans": [],
+  "closed_accounts": [],
+  "credit_inquiries": [
+    {
+      "date": "2024-10-15",
+      "institution": "HDFC Bank",
+      "purpose": "Credit Card",
+      "type": "Hard Inquiry"
+    },
+    {
+      "date": "2025-08-10",
+      "institution": "SBI",
+      "purpose": "Personal Loan",
+      "type": "Hard Inquiry"
+    }
+  ],
+  "payment_history": {
+    "missed_payments": 0,
+    "last_missed_payment_date": null,
+    "on_time_payment_ratio": 1.00
+  }
+}

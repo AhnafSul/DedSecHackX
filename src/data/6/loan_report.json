@@ -1,0 +1,44 @@
+{
+  "loan_repayment_history": {
+    "active_loans": [
+      {
+        "loan_type": "Car Loan",
+        "issuer": "HDFC Bank",
+        "loan_amount": 600000,
+        "outstanding_amount": 250000,
+        "emi_amount": 12000,
+        "tenure_months": 84,
+        "start_date": "2021-01-10",
+        "on_time_payments": 48,
+        "missed_payments": 2,
+        "last_missed_payment_date": "2024-03-15",
+        "prepayment_behavior": {
+          "has_prepayments": true,
+          "total_prepayment_amount": 75000,
+          "last_prepayment_date": "2023-12-20"
+        }
+      }
+    ],
+    "closed_loans": [
+      {
+        "loan_type": "Personal Loan",
+        "issuer": "Axis Bank",
+        "loan_amount": 300000,
+        "closed_on": "2023-12-01",
+        "closure_reason": "Loan Fully Paid",
+        "on_time_payments": 34,
+        "missed_payments": 2,
+        "prepayment_behavior": {
+          "has_prepayments": true,
+          "total_prepayment_amount": 50000,
+          "last_prepayment_date": "2023-11-15"
+        }
+      }
+    ],
+    "credit_utilization": {
+      "total_loan_limit": 900000,
+      "total_outstanding": 250000,
+      "utilization_ratio": 0.28
+    }
+  }
+}

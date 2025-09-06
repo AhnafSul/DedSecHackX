@@ -1,0 +1,65 @@
+{
+  "income_statement": {
+    "salary_slips": {
+      "employer": "Cognizant Technology Solutions",
+      "employment_type": "Permanent",
+      "current_designation": "Senior Software Engineer",
+      "date_of_joining": "2020-11-15",
+      "monthly_income": 95000,
+      "deductions": {
+        "pf": 7600,
+        "tax": 8500,
+        "other": 1200
+      },
+      "net_income": 77700,
+      "last_updated": "2025-08-31"
+    },
+    "business_income": {
+      "is_self_employed": false,
+      "gst_filing_status": "Not Applicable",
+      "monthly_profit": null,
+      "bank_statement_summary": null
+    },
+    "tax_returns": {
+      "itr_filed": true,
+      "financial_year": "2024-2025",
+      "total_taxable_income": 1140000,
+      "tax_paid": 102000,
+      "refund_status": "No Refund",
+      "sources_of_income": [
+        "Salary",
+        "Interest Income"
+      ],
+      "section_80c_deductions": {
+        "total_claimed": 120000,
+        "epf_contribution": 91200,
+        "children_tuition_fees": 20000,
+        "life_insurance_premium": 8800
+      }
+    },
+    "investment_portfolio": {
+      "mutual_funds": [
+        {
+          "fund_name": "ICICI Prudential Bluechip Fund",
+          "current_value": 180000,
+          "investment_type": "Equity"
+        }
+      ],
+      "fixed_deposits": [
+        {
+          "bank": "SBI",
+          "amount": 120000,
+          "maturity_date": "2026-06-15"
+        }
+      ],
+      "stocks": [
+        {
+          "company": "Wipro Ltd",
+          "quantity": 30,
+          "current_price": 420
+        }
+      ],
+      "real_estate_income": null
+    }
+  }
+}

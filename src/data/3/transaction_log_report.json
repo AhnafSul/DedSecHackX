@@ -1,0 +1,82 @@
+{
+  "transaction_logs": [
+    {
+      "merchant": "Local Kirana",
+      "category": "Groceries",
+      "frequency": 15,
+      "total_amount": 3000.0
+    },
+    {
+      "merchant": "Paytm Mall",
+      "category": "E-commerce",
+      "frequency": 3,
+      "total_amount": 1200.0
+    },
+    {
+      "merchant": "Auto Rickshaw",
+      "category": "Transportation",
+      "frequency": 20,
+      "total_amount": 800.0
+    }
+  ],
+  "utility_payments": {
+    "monthly_breakdown": [
+      {
+        "month": "January",
+        "electricity": {
+          "provider": "MSEB",
+          "due_date": "2023-01-10",
+          "payment_date": "2023-01-25",
+          "delay_days": 15,
+          "missed_payment": true,
+          "amount": 600.0
+        },
+        "mobile": {
+          "provider": "Airtel",
+          "due_date": "2023-01-05",
+          "payment_date": null,
+          "delay_days": null,
+          "missed_payment": true,
+          "amount": 299.0
+        }
+      }
+    ]
+  },
+  "ecommerce_activity": {
+    "platforms": [
+      "Paytm Mall"
+    ],
+    "purchases": 3,
+    "refunds": 0,
+    "total_spent": 1200.0,
+    "total_refunded": 0.0
+  },
+  "ride_delivery_usage": {
+    "ride_hailing": {
+      "services": [
+        "Auto Rickshaw"
+      ],
+      "rides": 20,
+      "total_spent": 800.0
+    },
+    "food_delivery": {
+      "services": [],
+      "orders": 0,
+      "total_spent": 0.0
+    }
+  },
+  "mobile_app_spending": {
+    "telecom_recharge": {
+      "providers": [
+        "Airtel"
+      ],
+      "recharges": 1,
+      "total_spent": 299.0
+    },
+    "app_store": {
+      "platform": "Google Play",
+      "purchases": 0,
+      "total_spent": 0.0
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "income_statement": {
+    "salary_slips": {
+      "employer": "Local IT Services",
+      "employment_type": "Contract",
+      "current_designation": "Contract Developer",
+      "date_of_joining": "2024-01-20",
+      "monthly_income": 35000,
+      "deductions": {
+        "pf": 0,
+        "tax": 1500,
+        "other": 200
+      },
+      "net_income": 33300,
+      "last_updated": "2025-08-31"
+    },
+    "business_income": {
+      "is_self_employed": true,
+      "gst_filing_status": "Irregular",
+      "monthly_profit": 15000,
+      "bank_statement_summary": "Inconsistent deposits"
+    },
+    "tax_returns": {
+      "itr_filed": false,
+      "financial_year": "2024-2025",
+      "total_taxable_income": null,
+      "tax_paid": null,
+      "refund_status": "Not Filed",
+      "sources_of_income": [
+        "Salary",
+        "Freelancing"
+      ],
+      "section_80c_deductions": null
+    },
+    "investment_portfolio": {
+      "mutual_funds": [],
+      "fixed_deposits": [],
+      "stocks": [],
+      "real_estate_income": null
+    }
+  }
+}

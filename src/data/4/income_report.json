@@ -1,0 +1,58 @@
+{
+  "income_statement": {
+    "salary_slips": {
+      "employer": "Wipro Technologies",
+      "employment_type": "Permanent",
+      "current_designation": "Software Engineer",
+      "date_of_joining": "2023-10-05",
+      "monthly_income": 55000,
+      "deductions": {
+        "pf": 4400,
+        "tax": 2500,
+        "other": 500
+      },
+      "net_income": 47600,
+      "last_updated": "2025-08-31"
+    },
+    "business_income": {
+      "is_self_employed": false,
+      "gst_filing_status": "Not Applicable",
+      "monthly_profit": null,
+      "bank_statement_summary": null
+    },
+    "tax_returns": {
+      "itr_filed": true,
+      "financial_year": "2024-2025",
+      "total_taxable_income": 660000,
+      "tax_paid": 30000,
+      "refund_status": "Refund Received",
+      "sources_of_income": [
+        "Salary"
+      ],
+      "section_80c_deductions": {
+        "total_claimed": 54400,
+        "epf_contribution": 52800,
+        "children_tuition_fees": 0,
+        "life_insurance_premium": 1600
+      }
+    },
+    "investment_portfolio": {
+      "mutual_funds": [
+        {
+          "fund_name": "SBI Small Cap Fund",
+          "current_value": 25000,
+          "investment_type": "Equity"
+        }
+      ],
+      "fixed_deposits": [
+        {
+          "bank": "SBI",
+          "amount": 50000,
+          "maturity_date": "2026-01-15"
+        }
+      ],
+      "stocks": [],
+      "real_estate_income": null
+    }
+  }
+}

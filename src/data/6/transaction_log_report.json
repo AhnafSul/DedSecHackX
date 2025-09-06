@@ -1,0 +1,104 @@
+{
+  "transaction_logs": [
+    {
+      "merchant": "More Supermarket",
+      "category": "Groceries",
+      "frequency": 6,
+      "total_amount": 4500.0
+    },
+    {
+      "merchant": "Amazon India",
+      "category": "E-commerce",
+      "frequency": 8,
+      "total_amount": 3500.0
+    },
+    {
+      "merchant": "Shell Petrol",
+      "category": "Fuel",
+      "frequency": 4,
+      "total_amount": 2800.0
+    },
+    {
+      "merchant": "Zomato",
+      "category": "Food Delivery",
+      "frequency": 10,
+      "total_amount": 2000.0
+    }
+  ],
+  "utility_payments": {
+    "monthly_breakdown": [
+      {
+        "month": "January",
+        "electricity": {
+          "provider": "KSEB",
+          "due_date": "2023-01-10",
+          "payment_date": "2023-01-12",
+          "delay_days": 2,
+          "missed_payment": false,
+          "amount": 650.0
+        },
+        "water": {
+          "provider": "KWA",
+          "due_date": "2023-01-15",
+          "payment_date": "2023-01-18",
+          "delay_days": 3,
+          "missed_payment": false,
+          "amount": 200.0
+        },
+        "internet": {
+          "provider": "BSNL Fiber",
+          "due_date": "2023-01-05",
+          "payment_date": "2023-01-05",
+          "delay_days": 0,
+          "missed_payment": false,
+          "amount": 699.0
+        },
+        "mobile": {
+          "provider": "Vi",
+          "due_date": "2023-01-07",
+          "payment_date": "2023-01-09",
+          "delay_days": 2,
+          "missed_payment": false,
+          "amount": 449.0
+        }
+      }
+    ]
+  },
+  "ecommerce_activity": {
+    "platforms": [
+      "Amazon India"
+    ],
+    "purchases": 8,
+    "refunds": 1,
+    "total_spent": 3500.0,
+    "total_refunded": 400.0
+  },
+  "ride_delivery_usage": {
+    "ride_hailing": {
+      "services": [],
+      "rides": 0,
+      "total_spent": 0.0
+    },
+    "food_delivery": {
+      "services": [
+        "Zomato"
+      ],
+      "orders": 10,
+      "total_spent": 2000.0
+    }
+  },
+  "mobile_app_spending": {
+    "telecom_recharge": {
+      "providers": [
+        "Vi"
+      ],
+      "recharges": 1,
+      "total_spent": 449.0
+    },
+    "app_store": {
+      "platform": "Google Play",
+      "purchases": 3,
+      "total_spent": 450.0
+    }
+  }
+}

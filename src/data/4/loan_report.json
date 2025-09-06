@@ -1,0 +1,11 @@
+{
+  "loan_repayment_history": {
+    "active_loans": [],
+    "closed_loans": [],
+    "credit_utilization": {
+      "total_loan_limit": 0,
+      "total_outstanding": 0,
+      "utilization_ratio": 0.00
+    }
+  }
+}

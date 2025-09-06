@@ -1,0 +1,91 @@
+
+{
+    "personal_info": {
+      "name": "John Doe",
+      "pan": "ABCDE1234F",
+      "aadhar": "1234-5678-9012",
+      "dob": "1990-05-15"
+    },
+    "credit_score": {
+      "score": 765,
+      "rating": "Good",
+      "last_updated": "2025-09-01"
+    },
+    "credit_cards": [
+      {
+        "issuer": "HDFC Bank",
+        "card_type": "Platinum",
+        "limit": 200000,
+        "available_limit": 50000,
+        "utilization_ratio": 0.75,
+        "status": "Active",
+        "opened_on": "2020-03-10"
+      },
+      {
+        "issuer": "ICICI Bank",
+        "card_type": "Gold",
+        "limit": 100000,
+        "available_limit": 80000,
+        "utilization_ratio": 0.20,
+        "status": "Active",
+        "opened_on": "2022-07-01"
+      }
+    ],
+    "loans": [
+      {
+        "type": "Personal Loan",
+        "issuer": "Axis Bank",
+        "amount": 500000,
+        "outstanding": 120000,
+        "tenure_months": 60,
+        "emi": 10500,
+        "status": "Active",
+        "opened_on": "2019-01-15"
+      },
+      {
+        "type": "Home Loan",
+        "issuer": "SBI",
+        "amount": 2500000,
+        "outstanding": 1800000,
+        "tenure_months": 240,
+        "emi": 22000,
+        "status": "Active",
+        "opened_on": "2018-06-20"
+      }
+    ],
+    "closed_accounts": [
+      {
+        "type": "Credit Card",
+        "issuer": "Kotak Mahindra Bank",
+        "limit": 50000,
+        "closed_on": "2023-04-10",
+        "closure_reason": "Customer Request"
+      },
+      {
+        "type": "Auto Loan",
+        "issuer": "Bajaj Finance",
+        "amount": 300000,
+        "closed_on": "2022-12-01",
+        "closure_reason": "Loan Fully Paid"
+      }
+    ],
+    "credit_inquiries": [
+      {
+        "date": "2025-08-15",
+        "institution": "Bajaj Finance",
+        "purpose": "Two-Wheeler Loan",
+        "type": "Hard Inquiry"
+      },
+      {
+        "date": "2025-07-10",
+        "institution": "HDFC Bank",
+        "purpose": "Credit Card",
+        "type": "Soft Inquiry"
+      }
+    ],
+    "payment_history": {
+      "missed_payments": 1,
+      "last_missed_payment_date": "2024-11-01",
+      "on_time_payment_ratio": 0.98
+    }
+}  

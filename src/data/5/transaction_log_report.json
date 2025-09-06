@@ -1,0 +1,78 @@
+{
+  "transaction_logs": [
+    {
+      "merchant": "Cash Withdrawal",
+      "category": "ATM",
+      "frequency": 25,
+      "total_amount": 15000.0
+    },
+    {
+      "merchant": "Local Vendors",
+      "category": "Cash Payments",
+      "frequency": 30,
+      "total_amount": 8000.0
+    },
+    {
+      "merchant": "Petrol Pump",
+      "category": "Fuel",
+      "frequency": 8,
+      "total_amount": 3000.0
+    }
+  ],
+  "utility_payments": {
+    "monthly_breakdown": [
+      {
+        "month": "January",
+        "electricity": {
+          "provider": "MSEB",
+          "due_date": "2023-01-10",
+          "payment_date": null,
+          "delay_days": null,
+          "missed_payment": true,
+          "amount": 800.0
+        },
+        "mobile": {
+          "provider": "Airtel",
+          "due_date": "2023-01-05",
+          "payment_date": "2023-01-20",
+          "delay_days": 15,
+          "missed_payment": true,
+          "amount": 399.0
+        }
+      }
+    ]
+  },
+  "ecommerce_activity": {
+    "platforms": [],
+    "purchases": 0,
+    "refunds": 0,
+    "total_spent": 0.0,
+    "total_refunded": 0.0
+  },
+  "ride_delivery_usage": {
+    "ride_hailing": {
+      "services": [],
+      "rides": 0,
+      "total_spent": 0.0
+    },
+    "food_delivery": {
+      "services": [],
+      "orders": 0,
+      "total_spent": 0.0
+    }
+  },
+  "mobile_app_spending": {
+    "telecom_recharge": {
+      "providers": [
+        "Airtel"
+      ],
+      "recharges": 1,
+      "total_spent": 399.0
+    },
+    "app_store": {
+      "platform": "Google Play",
+      "purchases": 0,
+      "total_spent": 0.0
+    }
+  }
+}

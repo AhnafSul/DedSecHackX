@@ -1,0 +1,89 @@
+{
+  "personal_info": {
+    "name": "Vikram Singh",
+    "pan": "EFGHI5678J",
+    "aadhar": "5678-9012-3456",
+    "dob": "1988-07-18"
+  },
+  "credit_score": {
+    "score": 520,
+    "rating": "Very Poor",
+    "last_updated": "2025-09-12"
+  },
+  "credit_cards": [
+    {
+      "issuer": "ICICI Bank",
+      "card_type": "Coral",
+      "limit": 100000,
+      "available_limit": 0,
+      "utilization_ratio": 1.00,
+      "status": "Blocked",
+      "opened_on": "2021-05-10"
+    },
+    {
+      "issuer": "Axis Bank",
+      "card_type": "Neo",
+      "limit": 75000,
+      "available_limit": 0,
+      "utilization_ratio": 1.00,
+      "status": "Closed",
+      "opened_on": "2020-12-15"
+    }
+  ],
+  "loans": [
+    {
+      "type": "Personal Loan",
+      "issuer": "Bajaj Finance",
+      "amount": 400000,
+      "outstanding": 380000,
+      "tenure_months": 48,
+      "emi": 12000,
+      "status": "NPA",
+      "opened_on": "2022-03-01"
+    },
+    {
+      "type": "Business Loan",
+      "issuer": "HDFC Bank",
+      "amount": 800000,
+      "outstanding": 750000,
+      "tenure_months": 60,
+      "emi": 18000,
+      "status": "Overdue",
+      "opened_on": "2021-08-15"
+    }
+  ],
+  "closed_accounts": [
+    {
+      "type": "Credit Card",
+      "issuer": "Axis Bank",
+      "limit": 75000,
+      "closed_on": "2024-06-20",
+      "closure_reason": "Bank Closure - Default"
+    }
+  ],
+  "credit_inquiries": [
+    {
+      "date": "2025-09-01",
+      "institution": "Money View",
+      "purpose": "Personal Loan",
+      "type": "Hard Inquiry"
+    },
+    {
+      "date": "2025-08-25",
+      "institution": "Lending Kart",
+      "purpose": "Business Loan",
+      "type": "Hard Inquiry"
+    },
+    {
+      "date": "2025-08-20",
+      "institution": "Capital First",
+      "purpose": "Personal Loan",
+      "type": "Hard Inquiry"
+    }
+  ],
+  "payment_history": {
+    "missed_payments": 15,
+    "last_missed_payment_date": "2025-08-30",
+    "on_time_payment_ratio": 0.45
+  }
+}

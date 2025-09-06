@@ -1,0 +1,67 @@
+{
+  "personal_info": {
+    "name": "Priya Sharma",
+    "pan": "BCDXY5678G",
+    "aadhar": "2345-6789-0123",
+    "dob": "1985-08-22"
+  },
+  "credit_score": {
+    "score": 820,
+    "rating": "Excellent",
+    "last_updated": "2025-09-15"
+  },
+  "credit_cards": [
+    {
+      "issuer": "HDFC Bank",
+      "card_type": "Infinia",
+      "limit": 500000,
+      "available_limit": 450000,
+      "utilization_ratio": 0.10,
+      "status": "Active",
+      "opened_on": "2018-05-15"
+    },
+    {
+      "issuer": "American Express",
+      "card_type": "Platinum",
+      "limit": 300000,
+      "available_limit": 280000,
+      "utilization_ratio": 0.07,
+      "status": "Active",
+      "opened_on": "2020-11-10"
+    }
+  ],
+  "loans": [
+    {
+      "type": "Home Loan",
+      "issuer": "HDFC Bank",
+      "amount": 5000000,
+      "outstanding": 2800000,
+      "tenure_months": 240,
+      "emi": 45000,
+      "status": "Active",
+      "opened_on": "2020-03-01"
+    }
+  ],
+  "closed_accounts": [
+    {
+      "type": "Personal Loan",
+      "issuer": "ICICI Bank",
+      "amount": 800000,
+      "closed_on": "2024-01-15",
+      "closure_reason": "Loan Fully Paid"
+    }
+  ],
+  "credit_inquiries": [
+    {
+      "date": "2025-08-01",
+      "institution": "HDFC Bank",
+      "purpose": "Credit Card Limit Enhancement",
+      "type": "Soft Inquiry"
+    }
+  ],
+  "payment_history": {
+    "missed_payments": 0,
+    "last_missed_payment_date": null,
+    "on_time_payment_ratio": 1.00
+  }
+}

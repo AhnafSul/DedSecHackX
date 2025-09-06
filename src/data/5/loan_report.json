@@ -1,0 +1,46 @@
+{
+  "loan_repayment_history": {
+    "active_loans": [
+      {
+        "loan_type": "Personal Loan",
+        "issuer": "Bajaj Finance",
+        "loan_amount": 400000,
+        "outstanding_amount": 380000,
+        "emi_amount": 12000,
+        "tenure_months": 48,
+        "start_date": "2022-03-01",
+        "on_time_payments": 12,
+        "missed_payments": 15,
+        "last_missed_payment_date": "2025-08-30",
+        "prepayment_behavior": {
+          "has_prepayments": false,
+          "total_prepayment_amount": 0,
+          "last_prepayment_date": null
+        }
+      },
+      {
+        "loan_type": "Business Loan",
+        "issuer": "HDFC Bank",
+        "loan_amount": 800000,
+        "outstanding_amount": 750000,
+        "emi_amount": 18000,
+        "tenure_months": 60,
+        "start_date": "2021-08-15",
+        "on_time_payments": 18,
+        "missed_payments": 12,
+        "last_missed_payment_date": "2025-08-15",
+        "prepayment_behavior": {
+          "has_prepayments": false,
+          "total_prepayment_amount": 0,
+          "last_prepayment_date": null
+        }
+      }
+    ],
+    "closed_loans": [],
+    "credit_utilization": {
+      "total_loan_limit": 1200000,
+      "total_outstanding": 1130000,
+      "utilization_ratio": 0.94
+    }
+  }
+}
