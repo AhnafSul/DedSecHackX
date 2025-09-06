@@ -147,11 +147,17 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
   }, [extractedData.aiDecision.recommendation]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-6 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-green-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
         
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-2xl">
           {/* Back Navigation */}
           <div className="flex items-center mb-4">
             <button
@@ -182,7 +188,7 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
         </div>
 
         {/* Applicant Info */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 transform hover:scale-[1.01] transition-all duration-300">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Applicant Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="flex items-center space-x-3">
@@ -218,79 +224,79 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 card-hover cursor-pointer" onClick={() => setShowCreditModal(true)}>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 cursor-pointer group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:bg-gradient-to-br hover:from-blue-50 hover:to-purple-50" onClick={() => setShowCreditModal(true)}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Credit Score</p>
-                <p className="text-2xl font-bold text-gray-900">{extractedData.financialMetrics.creditScore}</p>
-                <p className="text-sm mt-1 text-blue-600">+15</p>
+                <p className="text-sm text-gray-500 mb-1 group-hover:text-blue-600 transition-colors">Credit Score</p>
+                <p className="text-2xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{extractedData.financialMetrics.creditScore}</p>
+                <p className="text-sm mt-1 text-blue-600 animate-bounce">+15</p>
               </div>
-              <div className="p-3 rounded-full bg-blue-100">
-                <span className="text-2xl">📈</span>
+              <div className="p-3 rounded-full bg-blue-100 group-hover:bg-blue-200 group-hover:scale-110 transition-all duration-300">
+                <span className="text-2xl group-hover:animate-pulse">📈</span>
               </div>
             </div>
-            <div className="mt-2 text-xs text-blue-600">🔍 Click for breakdown</div>
+            <div className="mt-2 text-xs text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">🔍 Click for breakdown</div>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 card-hover">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:bg-gradient-to-br hover:from-green-50 hover:to-blue-50">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Monthly Income</p>
-                <p className="text-2xl font-bold text-gray-900">₹{(extractedData.financialMetrics.monthlyIncome / 1000).toFixed(0)}K</p>
-                <p className="text-sm mt-1 text-green-600">+5%</p>
+                <p className="text-sm text-gray-500 mb-1 group-hover:text-green-600 transition-colors">Monthly Income</p>
+                <p className="text-2xl font-bold text-gray-900 group-hover:text-green-700 transition-colors">₹{(extractedData.financialMetrics.monthlyIncome / 1000).toFixed(0)}K</p>
+                <p className="text-sm mt-1 text-green-600 animate-pulse">+5%</p>
               </div>
-              <div className="p-3 rounded-full bg-green-100">
+              <div className="p-3 rounded-full bg-green-100 group-hover:bg-green-200 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                 <span className="text-2xl">💰</span>
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 card-hover cursor-pointer" onClick={() => setShowDTIModal(true)}>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 cursor-pointer group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:bg-gradient-to-br hover:from-yellow-50 hover:to-orange-50" onClick={() => setShowDTIModal(true)}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">DTI Ratio</p>
-                <p className="text-2xl font-bold text-gray-900">{extractedData.financialMetrics.dtiRatio}%</p>
+                <p className="text-sm text-gray-500 mb-1 group-hover:text-yellow-600 transition-colors">DTI Ratio</p>
+                <p className="text-2xl font-bold text-gray-900 group-hover:text-yellow-700 transition-colors">{extractedData.financialMetrics.dtiRatio}%</p>
                 <p className="text-sm mt-1 text-yellow-600">{extractedData.financialMetrics.dtiRatio > 50 ? 'High' : extractedData.financialMetrics.dtiRatio > 30 ? 'Moderate' : 'Low'}</p>
               </div>
-              <div className="p-3 rounded-full bg-yellow-100">
+              <div className="p-3 rounded-full bg-yellow-100 group-hover:bg-yellow-200 group-hover:scale-110 group-hover:animate-bounce transition-all duration-300">
                 <span className="text-2xl">⚠️</span>
               </div>
             </div>
-            <div className="mt-2 text-xs text-yellow-600">🔍 Click for details</div>
+            <div className="mt-2 text-xs text-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">🔍 Click for details</div>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 card-hover cursor-pointer" onClick={() => setShowExpenseModal(true)}>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 cursor-pointer group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:bg-gradient-to-br hover:from-green-50 hover:to-teal-50" onClick={() => setShowExpenseModal(true)}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Expense Analysis</p>
-                <p className="text-2xl font-bold text-gray-900">₹{Math.round((extractedData.financialMetrics.monthlyIncome - extractedData.financialMetrics.totalEMI) * 0.7 / 1000)}K</p>
+                <p className="text-sm text-gray-500 mb-1 group-hover:text-green-600 transition-colors">Expense Analysis</p>
+                <p className="text-2xl font-bold text-gray-900 group-hover:text-green-700 transition-colors">₹{Math.round((extractedData.financialMetrics.monthlyIncome - extractedData.financialMetrics.totalEMI) * 0.7 / 1000)}K</p>
                 <p className="text-sm mt-1 text-green-600">Monthly Expenses</p>
               </div>
-              <div className="p-3 rounded-full bg-green-100">
+              <div className="p-3 rounded-full bg-green-100 group-hover:bg-green-200 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-300">
                 <span className="text-2xl">💰</span>
               </div>
             </div>
-            <div className="mt-2 text-xs text-green-600">🔍 Click for details</div>
+            <div className="mt-2 text-xs text-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">🔍 Click for details</div>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 card-hover cursor-pointer" onClick={() => setShowRiskModal(true)}>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 cursor-pointer group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50" onClick={() => setShowRiskModal(true)}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Risk Score</p>
-                <p className="text-2xl font-bold text-gray-900">{Math.round(extractedData.aiDecision.riskScore || 0)}/100</p>
-                <p className="text-sm mt-1 text-purple-600">{extractedData.aiDecision.recommendation}</p>
+                <p className="text-sm text-gray-500 mb-1 group-hover:text-purple-600 transition-colors">Risk Score</p>
+                <p className="text-2xl font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{Math.round(extractedData.aiDecision.riskScore || 0)}/100</p>
+                <p className="text-sm mt-1 text-purple-600 animate-pulse">{extractedData.aiDecision.recommendation}</p>
               </div>
-              <div className="p-3 rounded-full bg-purple-100">
+              <div className="p-3 rounded-full bg-purple-100 group-hover:bg-purple-200 group-hover:scale-110 group-hover:animate-spin transition-all duration-300">
                 <span className="text-2xl">📊</span>
               </div>
             </div>
-            <div className="mt-2 text-xs text-purple-600">🔍 Click for breakdown</div>
+            <div className="mt-2 text-xs text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">🔍 Click for breakdown</div>
           </div>
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Credit Score Trend</h3>
             <div className="h-64 p-4 relative">
               {(() => {
@@ -344,10 +350,10 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 cursor-pointer card-hover" onClick={() => setShowIncomeModal(true)}>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 cursor-pointer hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group" onClick={() => setShowIncomeModal(true)}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Income Breakdown</h3>
-              <span className="text-sm text-blue-600 hover:text-blue-800">🔍 Click to expand</span>
+              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">Income Breakdown</h3>
+              <span className="text-sm text-blue-600 hover:text-blue-800 group-hover:animate-bounce">🔍 Click to expand</span>
             </div>
             <div className="h-64 flex items-center justify-center">
               <div className="w-48 h-48 relative">
@@ -412,7 +418,7 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
         </div>
 
         {/* Risk Assessment */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">Risk Factor Analysis</h3>
           <div className="space-y-4">
             {riskFactors.map((factor, index) => (
@@ -442,7 +448,7 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
         </div>
 
         {/* Loan Amount Analyzer */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">💰 Loan Amount Analyzer</h3>
           {(() => {
             const maxLoan = extractedData.financialMetrics.monthlyIncome * 10;
@@ -603,7 +609,7 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
         </div>
 
         {/* Decision Summary */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 animate-gradient-x">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-semibold mb-2">Loan Decision Recommendation</h3>
@@ -620,9 +626,9 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
         <div className="fixed bottom-4 right-4 z-40">
           <button
             onClick={() => setShowChatBot(true)}
-            className="bg-gradient-to-r from-purple-500 to-blue-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+            className="bg-gradient-to-r from-purple-500 to-blue-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 hover:rotate-12 transition-all duration-300 flex items-center space-x-2 animate-pulse hover:animate-none group"
           >
-            <span className="text-2xl">🤖</span>
+            <span className="text-2xl group-hover:animate-bounce">🤖</span>
             <span className="font-semibold hidden sm:block">Ask AI</span>
           </button>
         </div>
