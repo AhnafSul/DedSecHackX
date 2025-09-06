@@ -62,12 +62,10 @@ function App() {
         
         // Start analysis for this stage
         if (stage.id !== 'init') {
-          console.log(`Starting ${stage.id} analysis...`);
           try {
-            const analysisResult = await novaService.analyzeApplicantData(applicantData, stage.id);
-            console.log(`${stage.id} analysis result:`, analysisResult);
+            await novaService.analyzeApplicantData(applicantData, stage.id);
           } catch (error) {
-            console.log(`${stage.id} analysis error:`, error);
+            // Analysis failed, will use local fallback
           }
         }
         
@@ -89,9 +87,8 @@ function App() {
           currentIndex++;
           if (currentIndex >= stages.length) {
             // Generate final recommendation
-            const finalResults = novaService.generateFinalRecommendation(applicantData);
+            const finalResults = await novaService.generateFinalRecommendation(applicantData);
             setAnalysisResults(finalResults);
-            console.log('Final analysis results:', finalResults);
             
             setTimeout(() => {
               setIsLoading(false);

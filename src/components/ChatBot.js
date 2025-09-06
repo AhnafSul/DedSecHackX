@@ -55,7 +55,10 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
           dtiRatio: analysisResults?.keyFactors?.dtiRatio,
           totalEMI: applicantData?.loan?.loan_repayment_history?.active_loans?.reduce((sum, loan) => sum + (loan.emi_amount || 0), 0),
           paymentHistory: applicantData?.credit?.payment_history?.on_time_payment_ratio,
-          creditUtilization: applicantData?.credit?.credit_cards?.[0]?.utilization_ratio
+          creditUtilization: applicantData?.credit?.credit_cards?.[0]?.utilization_ratio,
+          creditInquiries: applicantData?.credit?.credit_inquiries || [],
+          activeLoans: applicantData?.loan?.loan_repayment_history?.active_loans || [],
+          creditCards: applicantData?.credit?.credit_cards || []
         },
         loanDecision: {
           recommendation: analysisResults?.recommendation,
@@ -75,6 +78,16 @@ KEY INFO:
 • Payment History: ${(context.financialInfo.paymentHistory * 100).toFixed(1)}% on-time
 • Our Decision: ${context.loanDecision.recommendation}
 
+DETAILED DATA ACCESS:
+• Credit Inquiries: ${context.financialInfo.creditInquiries.map(inq => `${inq.inquiry_type} by ${inq.inquirer} on ${inq.inquiry_date}`).join(', ')}
+• Active Loans: ${context.financialInfo.activeLoans.map(loan => `${loan.loan_type} - ₹${loan.emi_amount}/month`).join(', ')}
+• Credit Cards: ${context.financialInfo.creditCards.map(card => `${card.card_type} (${Math.round(card.utilization_ratio * 100)}% used)`).join(', ')}
+
+CONDITIONAL APPROVAL GUIDELINES:
+- For credit scores 650-749: Loan amount up to 8x monthly income
+- Conditions: Maintain current payment record, provide guarantor if amount >₹5L
+- Interest rate: 12-15% based on final assessment
+
 QUESTION: "${message}"
 
 RESPOND LIKE A HUMAN ADVISOR:
@@ -84,7 +97,8 @@ RESPOND LIKE A HUMAN ADVISOR:
 - Use actual numbers from their data
 - Keep response under 150 words
 - No bullet points or formal formatting
-- Sound like you're explaining to a friend`;
+- Sound like you're explaining to a friend
+- For conditional approvals, mention specific conditions and loan amounts`;
 
       // Build conversation history for context
       const conversationHistory = messages.slice(-6).map(msg => ({
@@ -116,6 +130,10 @@ RESPOND LIKE A HUMAN ADVISOR:
       let botResponse = "I'm having trouble accessing the detailed analysis right now. Please try asking your question again.";
 
       if (response.ok) {
+        if (!novaService.current.connectionStatus) {
+          novaService.current.connectionStatus = 'connected';
+          novaService.current.showConnectionNotification();
+        }
         const result = await response.json();
         botResponse = result.output?.message?.content?.[0]?.text || botResponse;
       }
@@ -128,7 +146,6 @@ RESPOND LIKE A HUMAN ADVISOR:
 
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
-      console.error('Chat error:', error);
       const errorMessage = {
         type: 'bot',
         content: "I encountered an error while processing your question. Please try again.",

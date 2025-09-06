@@ -8,6 +8,8 @@ const Dashboard = ({ applicantData, analysisResults, onBack }) => {
   const [showExpenseModal, setShowExpenseModal] = React.useState(false);
   const [showCreditModal, setShowCreditModal] = React.useState(false);
   const [showRiskModal, setShowRiskModal] = React.useState(false);
+  const [loanAmount, setLoanAmount] = React.useState(500000);
+  const [rejectionAdvice, setRejectionAdvice] = React.useState('Getting personalized advice...');
   // Extract real data from JSON files
   const extractedData = {
     personalInfo: {
@@ -97,6 +99,52 @@ const Dashboard = ({ applicantData, analysisResults, onBack }) => {
       default: return '⚠️';
     }
   };
+
+  // Get AI advice for rejected applicants
+  React.useEffect(() => {
+    const decision = extractedData.aiDecision.recommendation;
+    const creditScore = extractedData.financialMetrics.creditScore;
+    const currentDTI = extractedData.financialMetrics.dtiRatio;
+    
+    if (decision === 'REJECT' || creditScore < 600 || currentDTI > 60) {
+      const getAIRejectionAdvice = async () => {
+        try {
+          const prompt = `As a financial advisor, give personalized advice to ${extractedData.personalInfo.name} whose loan was rejected:
+
+PROFILE:
+• Credit Score: ${creditScore}
+• Payment History: ${Math.round(extractedData.financialMetrics.paymentHistory * 100)}% on-time
+• DTI Ratio: ${currentDTI}%
+• Employment: ${extractedData.personalInfo.employment}
+• Monthly Income: ₹${extractedData.financialMetrics.monthlyIncome?.toLocaleString()}
+
+Provide specific, actionable advice in 2-3 sentences on how to improve their profile for future loan approval. Be encouraging but realistic.`;
+
+          const response = await fetch('https://bedrock-runtime.us-east-1.amazonaws.com/model/amazon.nova-pro-v1:0/invoke', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.REACT_APP_AWS_NOVA_KEY}`
+            },
+            body: JSON.stringify({
+              messages: [{ role: 'user', content: [{ text: prompt }] }],
+              inferenceConfig: { maxTokens: 200, temperature: 0.3 }
+            })
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            const aiAdvice = result.output?.message?.content?.[0]?.text || 'Focus on improving your credit score and payment history before reapplying.';
+            setRejectionAdvice(aiAdvice.trim());
+          }
+        } catch (error) {
+          setRejectionAdvice(`With a ${creditScore} credit score and ${Math.round(extractedData.financialMetrics.paymentHistory * 100)}% payment history, focus on timely payments for 6 months before reapplying.`);
+        }
+      };
+      
+      getAIRejectionAdvice();
+    }
+  }, [extractedData.aiDecision.recommendation]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
@@ -391,6 +439,167 @@ const Dashboard = ({ applicantData, analysisResults, onBack }) => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Loan Amount Analyzer */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">💰 Loan Amount Analyzer</h3>
+          {(() => {
+            const maxLoan = extractedData.financialMetrics.monthlyIncome * 10;
+            const newEMI = loanAmount / 60; // 5 year loan
+            const newDTI = Math.round(((extractedData.financialMetrics.totalEMI + newEMI) / extractedData.financialMetrics.monthlyIncome) * 100);
+            
+            const getEligibility = () => {
+              if (newDTI > 60) return { status: 'rejected', color: 'red', message: 'DTI too high - loan rejected' };
+              if (newDTI > 50) return { status: 'risky', color: 'orange', message: 'High risk - requires guarantor' };
+              if (newDTI > 40) return { status: 'conditional', color: 'yellow', message: 'Conditional approval' };
+              return { status: 'approved', color: 'green', message: 'Pre-approved' };
+            };
+            
+            const eligibility = getEligibility();
+            
+            return (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-xl">
+                    <p className="text-sm text-blue-700">Requested Amount</p>
+                    <p className="text-2xl font-bold text-blue-900">₹{loanAmount.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-xl">
+                    <p className="text-sm text-purple-700">Monthly EMI</p>
+                    <p className="text-2xl font-bold text-purple-900">₹{Math.round(newEMI).toLocaleString()}</p>
+                  </div>
+                  <div className={`bg-${eligibility.color}-50 p-4 rounded-xl`}>
+                    <p className={`text-sm text-${eligibility.color}-700`}>New DTI Ratio</p>
+                    <p className={`text-2xl font-bold text-${eligibility.color}-900`}>{newDTI}%</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>₹50,000</span>
+                    <span>₹{maxLoan.toLocaleString()}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="50000"
+                    max={maxLoan}
+                    step="25000"
+                    value={loanAmount}
+                    onChange={(e) => setLoanAmount(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                </div>
+                
+                <div className={`p-4 rounded-xl bg-${eligibility.color}-50 border border-${eligibility.color}-200`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className={`font-semibold text-${eligibility.color}-900`}>Eligibility Status</h4>
+                      <p className={`text-sm text-${eligibility.color}-700`}>{eligibility.message}</p>
+                    </div>
+                    <div className={`text-2xl`}>
+                      {eligibility.status === 'approved' ? '✅' : 
+                       eligibility.status === 'conditional' ? '⚠️' : 
+                       eligibility.status === 'risky' ? '🔍' : '❌'}
+                    </div>
+                  </div>
+                  
+                  {eligibility.status === 'conditional' && (
+                    <div className="mt-3 text-sm text-yellow-800">
+                      <p>• Interest rate: 12-14% per annum</p>
+                      <p>• Maintain current payment discipline</p>
+                      <p>• Income verification required</p>
+                    </div>
+                  )}
+                  
+                  {eligibility.status === 'risky' && (
+                    <div className="mt-3 text-sm text-orange-800">
+                      <p>• Guarantor required</p>
+                      <p>• Higher interest rate: 15-18%</p>
+                      <p>• Additional documentation needed</p>
+                    </div>
+                  )}
+                  
+                  {eligibility.status === 'approved' && (
+                    <div className="mt-3 text-sm text-green-800">
+                      <p>• Competitive interest rate: 10-12%</p>
+                      <p>• Fast processing</p>
+                      <p>• Minimal documentation</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* AI Recommendations */}
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl border border-purple-200">
+                  <div className="flex items-center mb-3">
+                    <span className="text-xl mr-2">🤖</span>
+                    <h4 className="font-semibold text-purple-900">AI Recommendations</h4>
+                  </div>
+                  {(() => {
+                    const getAIAdvice = () => {
+                      const creditScore = extractedData.financialMetrics.creditScore;
+                      const currentDTI = extractedData.financialMetrics.dtiRatio;
+                      const paymentHistory = extractedData.financialMetrics.paymentHistory;
+                      const decision = extractedData.aiDecision.recommendation;
+                      
+                      // Handle rejected applications with AI advice
+                      if (decision === 'REJECT' || creditScore < 600 || currentDTI > 60) {
+                        return {
+                          recommendation: "Personalized Improvement Plan",
+                          advice: rejectionAdvice,
+                          suggestedAmount: null,
+                          isRejected: true
+                        };
+                      }
+                      
+                      if (loanAmount <= extractedData.financialMetrics.monthlyIncome * 6) {
+                        return {
+                          recommendation: `Optimal loan amount for ${extractedData.personalInfo.name}`,
+                          advice: `Based on your ${creditScore} credit score and ${Math.round(paymentHistory * 100)}% payment history, this amount keeps you in a safe financial zone. Consider this for better approval odds.`,
+                          suggestedAmount: Math.round(extractedData.financialMetrics.monthlyIncome * 6)
+                        };
+                      } else if (loanAmount > extractedData.financialMetrics.monthlyIncome * 8) {
+                        return {
+                          recommendation: "Consider a lower amount",
+                          advice: `Your current DTI of ${currentDTI}% plus this loan would strain your finances. I'd suggest ₹${Math.round(extractedData.financialMetrics.monthlyIncome * 7).toLocaleString()} for better financial health.`,
+                          suggestedAmount: Math.round(extractedData.financialMetrics.monthlyIncome * 7)
+                        };
+                      } else {
+                        return {
+                          recommendation: "Reasonable choice",
+                          advice: `This amount works with your income profile. With your ${extractedData.personalInfo.employment} job and steady payments, you should qualify. Consider prepayment options to save on interest.`,
+                          suggestedAmount: loanAmount
+                        };
+                      }
+                    };
+                    
+                    const aiAdvice = getAIAdvice();
+                    
+                    return (
+                      <div className="space-y-2">
+                        <p className="font-medium text-purple-900">{aiAdvice.recommendation}</p>
+                        <p className="text-sm text-purple-700">{aiAdvice.advice}</p>
+                        {aiAdvice.isRejected ? (
+                          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+                            💡 Tip: Focus on timely payments and reducing existing debt before reapplying
+                          </div>
+                        ) : (
+                          aiAdvice.suggestedAmount !== loanAmount && (
+                            <button
+                              onClick={() => setLoanAmount(aiAdvice.suggestedAmount)}
+                              className="mt-2 px-3 py-1 bg-purple-600 text-white text-xs rounded-full hover:bg-purple-700 transition-colors"
+                            >
+                              Try ₹{aiAdvice.suggestedAmount.toLocaleString()}
+                            </button>
+                          )
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Decision Summary */}

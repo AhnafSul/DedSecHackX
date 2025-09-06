@@ -3,33 +3,26 @@ class AWSNovaService {
     this.apiKey = process.env.REACT_APP_AWS_NOVA_KEY;
     this.baseUrl = 'https://bedrock-runtime.us-east-1.amazonaws.com';
     this.analysisResults = {};
-    console.log('🔑 API Key loaded:', this.apiKey ? 'Found' : 'Missing');
-    this.testConnection();
+    this.connectionStatus = null;
   }
 
-  async testConnection() {
-    try {
-      const response = await fetch(`${this.baseUrl}/model/amazon.nova-pro-v1:0/invoke`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: [{ text: 'Test' }] }],
-          inferenceConfig: { maxTokens: 5, temperature: 0.1 }
-        })
-      });
-     
-      if (response.ok) {
-        console.log('✅ AWS Nova Pro AI connected successfully');
-      } else {
-        const errorText = await response.text();
-        console.log('❌ AWS Nova Pro AI connection failed:', response.status, errorText);
-      }
-    } catch (error) {
-      console.log('❌ AWS Nova Pro AI connection failed:', error.message);
-    }
+  showConnectionNotification() {
+    if (!this.apiKey) return;
+    
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-500';
+    notification.innerHTML = '✅ AWS Nova Connected';
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+      notification.style.transform = 'translateX(full)';
+      setTimeout(() => notification.remove(), 500);
+    }, 3000);
   }
 
   async analyzeApplicantData(applicantData, stage) {
@@ -81,16 +74,18 @@ class AWSNovaService {
       });
 
       if (response.ok) {
+        if (!this.connectionStatus) {
+          this.connectionStatus = 'connected';
+          this.showConnectionNotification();
+        }
         const result = await response.json();
         const analysis = result.output?.message?.content?.[0]?.text || 'Analysis completed';
         this.analysisResults[stage] = analysis;
         return analysis;
       } else {
-        console.log('AWS Nova API failed, using local analysis');
         return this.performLocalAnalysis(applicantData, stage);
       }
     } catch (error) {
-      console.log('AWS Nova error, using local analysis:', error.message);
       return this.performLocalAnalysis(applicantData, stage);
     }
   }
@@ -206,12 +201,84 @@ class AWSNovaService {
     return `Transaction Analysis: ₹${totalSpending.toLocaleString()} monthly spending pattern analyzed`;
   }
 
-  generateFinalRecommendation(applicantData) {
+  async generateFinalRecommendation(applicantData) {
     const creditScore = applicantData.credit?.credit_score?.score || 0;
     const monthlyIncome = applicantData.income?.income_statement?.salary_slips?.monthly_income || 0;
     const totalEMI = this.analysisResults.loan?.totalEMI || 0;
     const dtiRatio = totalEMI / monthlyIncome;
+    const paymentHistory = applicantData.credit?.payment_history?.on_time_payment_ratio || 0;
+    const employmentType = applicantData.income?.income_statement?.salary_slips?.employment_type;
 
+    // Try AI-powered decision first
+    if (this.apiKey) {
+      try {
+        const prompt = `As a senior loan underwriter, make a loan decision for this applicant:
+
+APPLICANT PROFILE:
+• Credit Score: ${creditScore}
+• Monthly Income: ₹${monthlyIncome.toLocaleString()}
+• Current EMI: ₹${totalEMI.toLocaleString()} (${Math.round(dtiRatio * 100)}% DTI)
+• Payment History: ${Math.round(paymentHistory * 100)}% on-time
+• Employment: ${employmentType}
+• Risk Factors: ${Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.riskFactors?.length || 0), 0)}
+• Positive Factors: ${Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.positives?.length || 0), 0)}
+
+Provide your decision in this exact format:
+DECISION: [APPROVE/CONDITIONAL APPROVE/REJECT/MANUAL REVIEW]
+RISK_SCORE: [0-100]
+REASONING: [2-3 key points explaining your decision]`;
+
+        const response = await fetch(`${this.baseUrl}/model/amazon.nova-pro-v1:0/invoke`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`
+          },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: [{ text: prompt }] }],
+            inferenceConfig: { maxTokens: 300, temperature: 0.2 }
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          const aiResponse = result.output?.message?.content?.[0]?.text || '';
+          
+          const decisionMatch = aiResponse.match(/DECISION:\s*([^\n]+)/);
+          const riskMatch = aiResponse.match(/RISK_SCORE:\s*(\d+)/);
+          const reasoningMatch = aiResponse.match(/REASONING:\s*([\s\S]+)/);
+          
+          if (decisionMatch) {
+            let cleanReasoning = ['AI analysis completed'];
+            if (reasoningMatch) {
+              cleanReasoning = reasoningMatch[1]
+                .trim()
+                .split(/[.!]\s+/)
+                .filter(sentence => sentence.length > 10)
+                .map(sentence => sentence.trim().replace(/^[•\-\*]\s*/, ''))
+                .slice(0, 3);
+            }
+            
+            return {
+              recommendation: decisionMatch[1].trim(),
+              reasoning: cleanReasoning,
+              riskScore: riskMatch ? parseInt(riskMatch[1]) : Math.round((100 - creditScore/8.5) + (dtiRatio * 30)),
+              keyFactors: {
+                creditScore,
+                monthlyIncome,
+                dtiRatio: Math.round(dtiRatio * 100),
+                totalRiskFactors: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.riskFactors?.length || 0), 0),
+                totalPositives: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.positives?.length || 0), 0)
+              }
+            };
+          }
+        }
+      } catch (error) {
+        // Fall back to rule-based if AI fails
+      }
+    }
+
+    // Fallback rule-based decision
     let recommendation = 'REJECT';
     let reasoning = [];
 
@@ -232,15 +299,13 @@ class AWSNovaService {
     return {
       recommendation,
       reasoning,
-      riskScore: Math.max(0, Math.min(100, (creditScore / 8.5) - (dtiRatio * 50))),
+      riskScore: Math.max(0, Math.min(100, (100 - creditScore/8.5) + (dtiRatio * 30))),
       keyFactors: {
         creditScore,
         monthlyIncome,
         dtiRatio: Math.round(dtiRatio * 100),
-        totalRiskFactors: Object.values(this.analysisResults).reduce((sum, analysis) => 
-          sum + (analysis.riskFactors?.length || 0), 0),
-        totalPositives: Object.values(this.analysisResults).reduce((sum, analysis) => 
-          sum + (analysis.positives?.length || 0), 0)
+        totalRiskFactors: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.riskFactors?.length || 0), 0),
+        totalPositives: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.positives?.length || 0), 0)
       }
     };
   }
