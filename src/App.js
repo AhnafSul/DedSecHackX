@@ -14,6 +14,16 @@ function App() {
   const [analysisResults, setAnalysisResults] = useState(null);
   const [novaService] = useState(new AWSNovaService());
 
+  // Handle browser back button
+  useEffect(() => {
+    const handlePopState = () => {
+      setSelectedApplicant(null);
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleSelectApplicant = (applicantId) => {
     setSelectedApplicant(applicantId);
     setIsLoading(true);
@@ -27,6 +37,9 @@ function App() {
     
     // Clear previous analysis
     novaService.clearResults();
+    
+    // Add to browser history
+    window.history.pushState({ applicantId }, '', `#applicant-${applicantId}`);
   };
 
   useEffect(() => {
@@ -101,7 +114,12 @@ function App() {
     return <LoadingAnimation stage={currentStage} progress={progress} />;
   }
 
-  return <Dashboard applicantData={applicantData} analysisResults={analysisResults} onBack={() => setSelectedApplicant(null)} />;
+  const handleBack = () => {
+    setSelectedApplicant(null);
+    window.history.pushState({}, '', '#');
+  };
+
+  return <Dashboard applicantData={applicantData} analysisResults={analysisResults} onBack={handleBack} />;
 }
 
 export default App;

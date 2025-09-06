@@ -86,6 +86,18 @@ RESPOND LIKE A HUMAN ADVISOR:
 - No bullet points or formal formatting
 - Sound like you're explaining to a friend`;
 
+      // Build conversation history for context
+      const conversationHistory = messages.slice(-6).map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: [{ text: msg.content }]
+      }));
+      
+      // Add current question with context
+      conversationHistory.push({
+        role: 'user',
+        content: [{ text: prompt }]
+      });
+
       const response = await fetch('https://bedrock-runtime.us-east-1.amazonaws.com/model/amazon.nova-pro-v1:0/invoke', {
         method: 'POST',
         headers: {
@@ -93,10 +105,7 @@ RESPOND LIKE A HUMAN ADVISOR:
           'Authorization': `Bearer ${novaService.current.apiKey}`
         },
         body: JSON.stringify({
-          messages: [{
-            role: 'user',
-            content: [{ text: prompt }]
-          }],
+          messages: conversationHistory,
           inferenceConfig: {
             maxTokens: 800,
             temperature: 0.3
