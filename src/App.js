@@ -12,6 +12,7 @@ function App() {
   const [progress, setProgress] = useState(0);
   const [applicantData, setApplicantData] = useState(null);
   const [analysisResults, setAnalysisResults] = useState(null);
+  const [connectionError, setConnectionError] = useState(false);
   const [novaService] = useState(new AWSNovaService());
 
   // Handle browser back button
@@ -47,9 +48,9 @@ function App() {
     
     const stages = [
       { id: 'init', duration: 1000, progress: 20 },
-      { id: 'income', duration: 2500, progress: 40 },
-      { id: 'credit', duration: 2000, progress: 60 },
-      { id: 'loan', duration: 2000, progress: 80 },
+      { id: 'income', duration: 1000, progress: 40 },
+      { id: 'credit', duration: 1000, progress: 60 },
+      { id: 'loan', duration: 1000, progress: 80 },
       { id: 'transaction', duration: 1500, progress: 100 }
     ];
 
@@ -107,8 +108,35 @@ function App() {
     return <ApplicantSelector onSelectApplicant={handleSelectApplicant} />;
   }
 
-  if (isLoading) {
-    return <LoadingAnimation stage={currentStage} progress={progress} />;
+  if (isLoading && !connectionError) {
+    return (
+      <LoadingAnimation 
+        stage={currentStage} 
+        progress={progress} 
+        onConnectionError={() => setConnectionError(true)}
+      />
+    );
+  }
+  
+  if (connectionError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 via-orange-900 to-red-900">
+        <div className="text-center space-y-6 p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-red-400/30 max-w-md">
+          <div className="text-6xl">❌</div>
+          <h2 className="text-2xl font-bold text-white">AWS Connection Failed</h2>
+          <p className="text-red-200">Unable to connect to AWS Nova AI service</p>
+          <button 
+            onClick={() => {
+              setConnectionError(false);
+              setSelectedApplicant(null);
+            }} 
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+          >
+            Back to Selection
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const handleBack = () => {
