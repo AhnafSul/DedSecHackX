@@ -1,10 +1,14 @@
 import React from 'react';
 import ChatBot from './components/ChatBot';
+import ExplainabilityPanel from './components/ExplainabilityPanel';
+import RegulatoryReport from './components/RegulatoryReport';
 
 const Dashboard = ({ applicantData, analysisResults, onBack }) => {
   const [showIncomeModal, setShowIncomeModal] = React.useState(false);
   const [showDTIModal, setShowDTIModal] = React.useState(false);
   const [showChatBot, setShowChatBot] = React.useState(false);
+  const [showExplainabilityPanel, setShowExplainabilityPanel] = React.useState(false);
+  const [showRegulatoryReport, setShowRegulatoryReport] = React.useState(false);
   const [showExpenseModal, setShowExpenseModal] = React.useState(false);
   const [showCreditModal, setShowCreditModal] = React.useState(false);
   const [showRiskModal, setShowRiskModal] = React.useState(false);
@@ -176,6 +180,13 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
               <p className="text-gray-600 mt-1">XAI-powered intelligent lending assessment</p>
             </div>
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowRegulatoryReport(true)}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
+              >
+                <span>📋</span>
+                <span>Compliance Report</span>
+              </button>
               <div className="text-right">
                 <p className="text-sm text-gray-500">Application ID</p>
                 <p className="font-semibold text-gray-900">#LN-2025-{applicantData?.credit?.personal_info?.name?.replace(/\s+/g, '').slice(0,3).toUpperCase() || '001'}</p>
@@ -617,7 +628,13 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold mb-1">{extractedData.aiDecision.recommendation || 'ANALYZING'}</div>
-              <div className="text-sm text-blue-200">{extractedData.aiDecision.reasoning?.[0] || 'AI analysis in progress...'}</div>
+              <div className="text-sm text-blue-200 mb-3">{extractedData.aiDecision.reasoning?.[0] || 'AI analysis in progress...'}</div>
+              <button
+                onClick={() => setShowExplainabilityPanel(true)}
+                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors backdrop-blur-sm"
+              >
+                🔍 View Detailed Explanation
+              </button>
             </div>
           </div>
         </div>
@@ -1337,6 +1354,22 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
         analysisResults={analysisResults}
         isOpen={showChatBot}
         onClose={() => setShowChatBot(false)}
+      />
+      
+      {/* Explainability Panel */}
+      <ExplainabilityPanel 
+        applicantData={applicantData}
+        analysisResults={analysisResults}
+        isOpen={showExplainabilityPanel}
+        onClose={() => setShowExplainabilityPanel(false)}
+      />
+      
+      {/* Regulatory Report */}
+      <RegulatoryReport 
+        applicantData={applicantData}
+        analysisResults={analysisResults}
+        isOpen={showRegulatoryReport}
+        onClose={() => setShowRegulatoryReport(false)}
       />
     </div>
   );

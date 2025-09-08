@@ -20,7 +20,11 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
     "How can they improve their credit score?",
     "Is their DTI ratio concerning?",
     "What's their repayment capacity?",
-    "How does their employment affect the decision?"
+    "How does their employment affect the decision?",
+    "What if they increase their income by 20%?",
+    "How would reducing debt by ₹10,000 help?",
+    "What credit score do they need for approval?",
+    "Can they get a co-signer to improve chances?"
   ];
 
   useEffect(() => {
@@ -67,7 +71,7 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
         }
       };
 
-      const prompt = `You are a friendly AI loan advisor chatting with someone about ${context.personalInfo.name}'s loan application. 
+      const prompt = `You are a friendly AI loan advisor with explainable AI capabilities, chatting about ${context.personalInfo.name}'s loan application. 
 
 KEY INFO:
 • ${context.personalInfo.name}, ${context.personalInfo.age} years old
@@ -77,11 +81,19 @@ KEY INFO:
 • Current EMIs: ₹${context.financialInfo.totalEMI?.toLocaleString()} (${context.financialInfo.dtiRatio}% of income)
 • Payment History: ${(context.financialInfo.paymentHistory * 100).toFixed(1)}% on-time
 • Our Decision: ${context.loanDecision.recommendation}
+• Risk Score: ${context.loanDecision.riskScore}/100
 
 DETAILED DATA ACCESS:
 • Credit Inquiries: ${context.financialInfo.creditInquiries.map(inq => `${inq.inquiry_type} by ${inq.inquirer} on ${inq.inquiry_date}`).join(', ')}
 • Active Loans: ${context.financialInfo.activeLoans.map(loan => `${loan.loan_type} - ₹${loan.emi_amount}/month`).join(', ')}
 • Credit Cards: ${context.financialInfo.creditCards.map(card => `${card.card_type} (${Math.round(card.utilization_ratio * 100)}% used)`).join(', ')}
+
+EXPLAINABILITY FEATURES:
+- Provide specific reasons for decisions with exact thresholds
+- Offer what-if scenarios when asked (e.g., "If credit score improves by X points...")
+- Give actionable improvement advice with timelines
+- Explain how each factor contributes to the final decision
+- Use transparency in all explanations
 
 CONDITIONAL APPROVAL GUIDELINES:
 - For credit scores 650-749: Loan amount up to 8x monthly income
@@ -90,15 +102,14 @@ CONDITIONAL APPROVAL GUIDELINES:
 
 QUESTION: "${message}"
 
-RESPOND LIKE A HUMAN ADVISOR:
-- Keep it conversational and friendly
-- Use simple language, avoid jargon
-- Give 2-3 key points max
-- Use actual numbers from their data
-- Keep response under 150 words
-- No bullet points or formal formatting
-- Sound like you're explaining to a friend
-- For conditional approvals, mention specific conditions and loan amounts`;
+RESPOND LIKE AN EXPERT ADVISOR:
+- Be conversational but informative
+- Provide specific numbers and thresholds
+- Offer actionable insights
+- Use actual data from their profile
+- Keep response under 200 words
+- Include what-if scenarios when relevant
+- Explain the 'why' behind decisions clearly`;
 
       // Build conversation history for context
       const conversationHistory = messages.slice(-6).map(msg => ({
@@ -190,7 +201,7 @@ RESPOND LIKE A HUMAN ADVISOR:
               <div className="text-sm whitespace-pre-wrap">
                 {message.content.split('\n').map((line, i) => (
                   <p key={i} className={line.trim() === '' ? 'mb-2' : 'mb-1'}>
-                    {line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/###\s*(.*)/g, '$1').replace(/\*\s*(.*)/g, '• $1')}
+                    {line.replace(/\*+/g, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/###\s*(.*)/g, '$1').replace(/^[•\-\*]\s*/g, '')}
                   </p>
                 ))}
               </div>
@@ -217,16 +228,28 @@ RESPOND LIKE A HUMAN ADVISOR:
 
       {/* Suggested Questions */}
       <div className="p-3 border-t border-gray-200">
-        <p className="text-xs text-gray-600 mb-2">💡 Suggested questions:</p>
-        <div className="flex flex-wrap gap-1">
-          {suggestedQuestions.slice(0, 3).map((question, index) => (
+        <p className="text-xs text-gray-600 mb-2">💡 Ask me about:</p>
+        <div className="grid grid-cols-2 gap-1 mb-2">
+          {suggestedQuestions.slice(0, 4).map((question, index) => (
             <button
               key={index}
               onClick={() => handleSendMessage(question)}
-              className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-100 transition-colors"
+              className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-100 transition-colors text-left"
               disabled={isLoading}
             >
-              {question}
+              {question.length > 25 ? question.substring(0, 25) + '...' : question}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {suggestedQuestions.slice(4, 6).map((question, index) => (
+            <button
+              key={index + 4}
+              onClick={() => handleSendMessage(question)}
+              className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full hover:bg-purple-100 transition-colors"
+              disabled={isLoading}
+            >
+              {question.length > 30 ? question.substring(0, 30) + '...' : question}
             </button>
           ))}
         </div>
