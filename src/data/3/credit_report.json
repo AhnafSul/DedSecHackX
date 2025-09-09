@@ -12,7 +12,7 @@
   },
   "credit_cards": [
     {
-      "issuer": "ICICI Bank",
+      "issuer": "XYZ Bank",
       "card_type": "Basic",
       "limit": 50000,
       "available_limit": 5000,
@@ -21,7 +21,7 @@
       "opened_on": "2023-01-15"
     },
     {
-      "issuer": "SBI Card",
+      "issuer": "DEF Card",
       "card_type": "Simply Click",
       "limit": 30000,
       "available_limit": 0,
@@ -33,7 +33,7 @@
   "loans": [
     {
       "type": "Personal Loan",
-      "issuer": "Bajaj Finance",
+      "issuer": "JKL Finance",
       "amount": 200000,
       "outstanding": 180000,
       "tenure_months": 36,
@@ -43,7 +43,7 @@
     },
     {
       "type": "Two Wheeler Loan",
-      "issuer": "HDFC Bank",
+      "issuer": "ABC Bank",
       "amount": 80000,
       "outstanding": 45000,
       "tenure_months": 24,

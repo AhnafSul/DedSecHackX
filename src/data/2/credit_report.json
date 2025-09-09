@@ -12,7 +12,7 @@
   },
   "credit_cards": [
     {
-      "issuer": "HDFC Bank",
+      "issuer": "ABC Bank",
       "card_type": "Infinia",
       "limit": 500000,
       "available_limit": 450000,
@@ -21,7 +21,7 @@
       "opened_on": "2018-05-15"
     },
     {
-      "issuer": "American Express",
+      "issuer": "MNO Express",
       "card_type": "Platinum",
       "limit": 300000,
       "available_limit": 280000,
@@ -33,7 +33,7 @@
   "loans": [
     {
       "type": "Home Loan",
-      "issuer": "HDFC Bank",
+      "issuer": "ABC Bank",
       "amount": 5000000,
       "outstanding": 2800000,
       "tenure_months": 240,
@@ -45,7 +45,7 @@
   "closed_accounts": [
     {
       "type": "Personal Loan",
-      "issuer": "ICICI Bank",
+      "issuer": "XYZ Bank",
       "amount": 800000,
       "closed_on": "2024-01-15",
       "closure_reason": "Loan Fully Paid"
@@ -54,7 +54,7 @@
   "credit_inquiries": [
     {
       "date": "2025-08-01",
-      "institution": "HDFC Bank",
+      "institution": "ABC Bank",
       "purpose": "Credit Card Limit Enhancement",
       "type": "Soft Inquiry"
     }

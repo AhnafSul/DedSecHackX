@@ -25,12 +25,38 @@ const Dashboard = ({ applicantData, analysisResults, onBack }) => {
     },
     financialMetrics: {
       creditScore: applicantData?.credit?.credit_score?.score || 0,
+      creditRating: applicantData?.credit?.credit_score?.rating || 'N/A',
       monthlyIncome: applicantData?.income?.income_statement?.salary_slips?.monthly_income || 0,
       netIncome: applicantData?.income?.income_statement?.salary_slips?.net_income || 0,
       totalEMI: applicantData?.loan?.loan_repayment_history?.active_loans?.reduce((sum, loan) => sum + (loan.emi_amount || 0), 0) || 0,
       dtiRatio: 0,
       paymentHistory: applicantData?.credit?.payment_history?.on_time_payment_ratio || 0,
-      creditUtilization: applicantData?.credit?.credit_cards?.[0]?.utilization_ratio || 0
+      missedPayments: applicantData?.credit?.payment_history?.missed_payments || 0,
+      creditUtilization: (() => {
+        const cards = applicantData?.credit?.credit_cards || [];
+        if (cards.length === 0) return 0;
+        // Calculate weighted average utilization
+        const totalUsed = cards.reduce((sum, card) => sum + ((card.limit || 0) * (card.utilization_ratio || 0)), 0);
+        const totalLimit = cards.reduce((sum, card) => sum + (card.limit || 0), 0);
+        const utilization = totalLimit > 0 ? totalUsed / totalLimit : 0;
+        console.log(`Credit Utilization Debug - Cards: ${cards.length}, Total Used: ${totalUsed}, Total Limit: ${totalLimit}, Utilization: ${utilization}`);
+        return utilization;
+      })(),
+      totalAssets: (() => {
+        const investments = applicantData?.income?.income_statement?.investment_portfolio;
+        let total = 0;
+        if (investments?.mutual_funds) total += investments.mutual_funds.reduce((sum, fund) => sum + (fund.current_value || 0), 0);
+        if (investments?.fixed_deposits) total += investments.fixed_deposits.reduce((sum, fd) => sum + (fd.amount || 0), 0);
+        if (investments?.stocks) total += investments.stocks.reduce((sum, stock) => sum + ((stock.quantity || 0) * (stock.current_price || 0)), 0);
+        return total;
+      })(),
+      rentalIncome: applicantData?.income?.income_statement?.investment_portfolio?.real_estate_income?.monthly_rent || 0,
+      employmentType: applicantData?.income?.income_statement?.salary_slips?.employment_type || 'N/A',
+      employer: applicantData?.income?.income_statement?.salary_slips?.employer || 'N/A',
+      itrFiled: applicantData?.income?.income_statement?.tax_returns?.itr_filed || false,
+      creditInquiries: applicantData?.credit?.credit_inquiries?.length || 0,
+      activeLoansCount: applicantData?.loan?.loan_repayment_history?.active_loans?.length || 0,
+      creditCardsCount: applicantData?.credit?.credit_cards?.length || 0
     },
     aiDecision: analysisResults || {
       recommendation: 'ANALYZING',
@@ -41,10 +67,12 @@ const Dashboard = ({ applicantData, analysisResults, onBack }) => {
   };
   
   // Calculate DTI ratio
-  if (extractedData.financialMetrics.monthlyIncome > 0) {
+  if (extractedData.financialMetrics.monthlyIncome > 0 && extractedData.financialMetrics.totalEMI > 0) {
     extractedData.financialMetrics.dtiRatio = Math.round(
       (extractedData.financialMetrics.totalEMI / extractedData.financialMetrics.monthlyIncome) * 100
     );
+  } else {
+    extractedData.financialMetrics.dtiRatio = 0;
   }
   // Generate risk factors from real data
   const riskFactors = [
@@ -628,7 +656,6 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold mb-1">{extractedData.aiDecision.recommendation || 'ANALYZING'}</div>
-              <div className="text-sm text-blue-200 mb-3">{extractedData.aiDecision.reasoning?.[0] || 'AI analysis in progress...'}</div>
               <button
                 onClick={() => setShowExplainabilityPanel(true)}
                 className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors backdrop-blur-sm"
@@ -851,6 +878,9 @@ Provide specific, actionable advice in 2-3 sentences on how to improve their pro
                 const dtiRatio = extractedData.financialMetrics.dtiRatio;
                 const activeLoans = applicantData?.loan?.loan_repayment_history?.active_loans || [];
                 const disposableIncome = monthlyIncome - totalEMI;
+                
+                // Debug comprehensive data availability
+                console.log(`Data Check - Income: ₹${monthlyIncome}, EMI: ₹${totalEMI}, DTI: ${dtiRatio}%, Active Loans: ${activeLoans.length}, Credit Cards: ${applicantData?.credit?.credit_cards?.length || 0}, Assets: ₹${extractedData.financialMetrics.totalAssets || 0}`);
                 
                 return (
                   <div className="space-y-6">

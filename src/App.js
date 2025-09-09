@@ -48,10 +48,10 @@ function App() {
     
     const stages = [
       { id: 'init', duration: 1000, progress: 20 },
-      { id: 'income', duration: 1000, progress: 40 },
-      { id: 'credit', duration: 1000, progress: 60 },
-      { id: 'loan', duration: 1000, progress: 80 },
-      { id: 'transaction', duration: 1500, progress: 100 }
+      { id: 'income', duration: 500, progress: 40 },
+      { id: 'credit', duration: 500, progress: 60 },
+      { id: 'loan', duration: 500, progress: 80 },
+      { id: 'transaction', duration: 500, progress: 100 }
     ];
 
     let currentIndex = 0;

@@ -4,7 +4,7 @@
       "active_loans": [
         {
           "loan_type": "Personal Loan",
-          "issuer": "Axis Bank",
+          "issuer": "PQR Bank",
           "loan_amount": 500000,
           "outstanding_amount": 120000,
           "emi_amount": 10500,
@@ -21,7 +21,7 @@
         },
         {
           "loan_type": "Home Loan",
-          "issuer": "SBI",
+          "issuer": "DEF Bank",
           "loan_amount": 2500000,
           "outstanding_amount": 1800000,
           "emi_amount": 22000,
@@ -39,7 +39,7 @@
       "closed_loans": [
         {
           "loan_type": "Auto Loan",
-          "issuer": "Bajaj Finance",
+          "issuer": "JKL Finance",
           "loan_amount": 300000,
           "closed_on": "2022-12-01",
           "closure_reason": "Loan Fully Paid",

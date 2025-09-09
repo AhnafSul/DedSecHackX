@@ -12,7 +12,7 @@
   },
   "credit_cards": [
     {
-      "issuer": "SBI Card",
+      "issuer": "DEF Card",
       "card_type": "Prime",
       "limit": 150000,
       "available_limit": 90000,
@@ -21,7 +21,7 @@
       "opened_on": "2019-08-20"
     },
     {
-      "issuer": "ICICI Bank",
+      "issuer": "XYZ Bank",
       "card_type": "Amazon Pay",
       "limit": 80000,
       "available_limit": 60000,
@@ -33,7 +33,7 @@
   "loans": [
     {
       "type": "Car Loan",
-      "issuer": "HDFC Bank",
+      "issuer": "ABC Bank",
       "amount": 600000,
       "outstanding": 250000,
       "tenure_months": 84,
@@ -45,7 +45,7 @@
   "closed_accounts": [
     {
       "type": "Personal Loan",
-      "issuer": "Axis Bank",
+      "issuer": "PQR Bank",
       "amount": 300000,
       "closed_on": "2023-12-01",
       "closure_reason": "Loan Fully Paid"
@@ -54,13 +54,13 @@
   "credit_inquiries": [
     {
       "date": "2025-07-15",
-      "institution": "HDFC Bank",
+      "institution": "ABC Bank",
       "purpose": "Home Loan",
       "type": "Hard Inquiry"
     },
     {
       "date": "2025-06-20",
-      "institution": "SBI",
+      "institution": "DEF Bank",
       "purpose": "Credit Card Limit Enhancement",
       "type": "Soft Inquiry"
     }

@@ -3,7 +3,7 @@
     "active_loans": [
       {
         "loan_type": "Home Loan",
-        "issuer": "HDFC Bank",
+        "issuer": "ABC Bank",
         "loan_amount": 5000000,
         "outstanding_amount": 2800000,
         "emi_amount": 45000,
@@ -22,7 +22,7 @@
     "closed_loans": [
       {
         "loan_type": "Personal Loan",
-        "issuer": "ICICI Bank",
+        "issuer": "XYZ Bank",
         "loan_amount": 800000,
         "closed_on": "2024-01-15",
         "closure_reason": "Loan Fully Paid",

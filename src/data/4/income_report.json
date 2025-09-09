@@ -1,7 +1,7 @@
 {
   "income_statement": {
     "salary_slips": {
-      "employer": "Wipro Technologies",
+      "employer": "STU Technologies",
       "employment_type": "Permanent",
       "current_designation": "Software Engineer",
       "date_of_joining": "2023-10-05",
@@ -39,14 +39,14 @@
     "investment_portfolio": {
       "mutual_funds": [
         {
-          "fund_name": "SBI Small Cap Fund",
+          "fund_name": "DEF Small Cap Fund",
           "current_value": 25000,
           "investment_type": "Equity"
         }
       ],
       "fixed_deposits": [
         {
-          "bank": "SBI",
+          "bank": "DEF Bank",
           "amount": 50000,
           "maturity_date": "2026-01-15"
         }

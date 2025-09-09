@@ -212,33 +212,59 @@ class AWSNovaService {
     // Try AI-powered decision first
     if (this.apiKey) {
       try {
+        // Calculate DTI properly for AI prompt
         const actualDTI = monthlyIncome > 0 ? totalEMI / monthlyIncome : 0;
+        const dtiPercentage = Math.round(actualDTI * 100);
         const assets = this.calculateAssetValue(applicantData);
         const creditAge = this.calculateCreditAge(applicantData);
         const utilization = this.calculateCreditUtilization(applicantData);
         const inquiries = applicantData.credit?.credit_inquiries?.length || 0;
         
-        const prompt = `As a senior loan underwriter, make a binary loan decision:
+        const prompt = `You are a senior loan underwriter for UNSECURED PERSONAL LOANS. Make balanced decisions with proper risk assessment.
 
-COMPREHENSIVE PROFILE:
+STRICT LENDING STANDARDS:
+- Credit Score BELOW 550: AUTOMATIC REJECT (too high risk)
+- Credit Score 550-599: REJECT unless ALL other factors are excellent
+- Credit Score 600-649: APPROVE if DTI <40% AND Payment History >80%
+- Credit Score 650+: APPROVE with reasonable DTI and payment history
+- DTI above 60%: REJECT regardless of credit score
+- Payment History below 70%: REJECT (shows poor discipline)
+
+APPLICANT PROFILE:
 • Credit Score: ${creditScore} (${this.getCreditRating(creditScore)})
 • Monthly Income: ₹${monthlyIncome.toLocaleString()} (${employmentType})
-• Current EMI: ₹${totalEMI.toLocaleString()} (${Math.round(actualDTI * 100)}% DTI)
-• Payment History: ${Math.round(paymentHistory * 100)}% on-time
+• Current EMI: ₹${totalEMI.toLocaleString()}
+• Debt-to-Income Ratio: ${dtiPercentage}%
+• Payment History: ${Math.round(paymentHistory * 100)}% on-time payments
 • Credit Utilization: ${Math.round(utilization * 100)}%
-• Credit Age: ${creditAge} months
-• Recent Inquiries: ${inquiries}
-• Total Assets: ₹${assets.toLocaleString()}
-• Real Estate: ₹${this.getRealEstateValue(applicantData).toLocaleString()}
-• Investments: ₹${this.getInvestmentValue(applicantData).toLocaleString()}
+• Employment: ${employmentType}
 
-Make a clear APPROVE or REJECT decision. No conditional approvals.
+DECISION FRAMEWORK:
+1. Check minimum credit score threshold (550+)
+2. Assess DTI sustainability (<50% preferred, <60% maximum)
+3. Evaluate payment discipline (80%+ preferred, 70%+ minimum)
+4. Consider employment stability as tie-breaker
+5. Make holistic decision with proper risk weighting
 
-Provide decision (NO asterisks):
-DECISION: [APPROVE/REJECT]
-RISK_SCORE: [0-100 where 0=lowest risk, 100=highest risk]
-REASONING: [3-4 key factors in plain text]
-IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
+IMPROVEMENT GUIDANCE REQUIRED:
+- ALWAYS provide improvement tips regardless of approval/rejection
+- For APPROVED: Suggest ways to maintain good standing
+- For REJECTED: Provide specific steps to become approvable
+- Focus on the 2-3 weakest factors in the profile
+- Give realistic timelines for improvement (3-6 months typical)
+
+FORMATTING REQUIREMENTS:
+- Use NO asterisks, bullets, or special characters
+- Write in plain text only
+- Keep responses clean and simple
+- Use only letters, numbers, spaces, and basic punctuation
+
+Provide your response in this exact format:
+
+DECISION: APPROVE or REJECT
+RISK_SCORE: number from 0 to 100
+REASONING: Plain text explanation without any formatting
+IMPROVEMENT_TIPS: Plain text suggestions without bullets or asterisks`;
 
         const response = await fetch(`${this.baseUrl}/model/amazon.nova-pro-v1:0/invoke`, {
           method: 'POST',
@@ -256,18 +282,30 @@ IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
           const result = await response.json();
           const aiResponse = result.output?.message?.content?.[0]?.text || '';
           
-          const decisionMatch = aiResponse.match(/DECISION:\s*([^\n]+)/);
-          const riskMatch = aiResponse.match(/RISK_SCORE:\s*(\d+)/);
-          const reasoningMatch = aiResponse.match(/REASONING:\s*([\s\S]*?)(?=IMPROVEMENT_TIPS:|$)/);
-          const improvementMatch = aiResponse.match(/IMPROVEMENT_TIPS:\s*([\s\S]+)/);
+          // Clean the entire AI response first
+          const cleanedResponse = aiResponse
+            .replace(/\*+/g, '') // Remove all asterisks
+            .replace(/#+/g, '') // Remove hash symbols
+            .replace(/^[•\-\*]\s*/gm, '') // Remove bullet points
+            .trim();
+          
+          const decisionMatch = cleanedResponse.match(/DECISION:\s*([^\n\r]+)/);
+          const riskMatch = cleanedResponse.match(/RISK_SCORE:\s*(\d+)/);
+          const reasoningMatch = cleanedResponse.match(/REASONING:\s*([\s\S]*?)(?=IMPROVEMENT_TIPS:|$)/);
+          const improvementMatch = cleanedResponse.match(/IMPROVEMENT_TIPS:\s*([\s\S]+)/);
           
           if (decisionMatch) {
+            // Clean decision text
+            const cleanDecision = decisionMatch[1]
+              .trim()
+              .replace(/[^A-Z\s]/g, '') // Keep only letters and spaces
+              .replace(/\s+/g, ' ') // Normalize spaces
+              .trim();
+            
             let cleanReasoning = ['AI analysis completed'];
             if (reasoningMatch) {
               cleanReasoning = reasoningMatch[1]
                 .trim()
-                .replace(/\*+/g, '')
-                .replace(/^[•\-\*]\s*/gm, '')
                 .split(/[.!]\s+/)
                 .filter(sentence => sentence.length > 10)
                 .map(sentence => sentence.trim())
@@ -278,8 +316,6 @@ IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
             if (improvementMatch) {
               improvementTips = improvementMatch[1]
                 .trim()
-                .replace(/\*+/g, '')
-                .replace(/^[•\-\*]\s*/gm, '')
                 .split(/[.!]\s+/)
                 .filter(tip => tip.length > 10)
                 .map(tip => tip.trim())
@@ -287,17 +323,29 @@ IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
             }
             
             return {
-              recommendation: decisionMatch[1].trim(),
+              recommendation: cleanDecision,
               reasoning: cleanReasoning,
               improvementTips,
               riskScore: riskMatch ? parseInt(riskMatch[1]) : this.calculateComprehensiveRiskScore(applicantData),
               keyFactors: {
                 creditScore,
+                creditRating: applicantData?.credit?.credit_score?.rating,
                 monthlyIncome,
-                dtiRatio: Math.round(actualDTI * 100),
+                netIncome: applicantData?.income?.income_statement?.salary_slips?.net_income,
+                dtiRatio: dtiPercentage,
+                totalEMI,
+                paymentHistory: Math.round(paymentHistory * 100),
+                missedPayments: applicantData?.credit?.payment_history?.missed_payments || 0,
                 totalAssets: assets,
                 creditUtilization: Math.round(utilization * 100),
                 creditAge,
+                employmentType,
+                employer: applicantData?.income?.income_statement?.salary_slips?.employer,
+                itrFiled: applicantData?.income?.income_statement?.tax_returns?.itr_filed,
+                rentalIncome: applicantData?.income?.income_statement?.investment_portfolio?.real_estate_income?.monthly_rent || 0,
+                creditInquiries: inquiries,
+                activeLoansCount: applicantData?.loan?.loan_repayment_history?.active_loans?.length || 0,
+                creditCardsCount: applicantData?.credit?.credit_cards?.length || 0,
                 totalRiskFactors: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.riskFactors?.length || 0), 0),
                 totalPositives: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.positives?.length || 0), 0)
               },
@@ -320,13 +368,13 @@ IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
 
     const riskScore = this.calculateComprehensiveRiskScore(applicantData);
     
-    if (riskScore <= 30) {
+    if (riskScore <= 35) {
       recommendation = 'APPROVE';
-      reasoning.push('Low risk profile with strong financial indicators');
+      reasoning.push('Acceptable risk profile with manageable financial indicators');
     } else {
       recommendation = 'REJECT';
-      reasoning.push('High risk profile exceeds acceptable lending thresholds');
-      improvementTips.push('Improve credit score and reduce debt burden', 'Build stronger asset base and payment history');
+      reasoning.push('Risk profile exceeds acceptable lending thresholds');
+      improvementTips.push('Improve credit score and maintain consistent payment history', 'Consider reducing existing debt burden');
     }
 
     const actualDTI = monthlyIncome > 0 ? totalEMI / monthlyIncome : 0;
@@ -337,11 +385,23 @@ IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
       riskScore: this.calculateComprehensiveRiskScore(applicantData),
       keyFactors: {
         creditScore,
+        creditRating: applicantData?.credit?.credit_score?.rating,
         monthlyIncome,
-        dtiRatio: Math.round(actualDTI * 100),
+        netIncome: applicantData?.income?.income_statement?.salary_slips?.net_income,
+        dtiRatio: Math.round((monthlyIncome > 0 && totalEMI > 0 ? totalEMI / monthlyIncome : 0) * 100),
+        totalEMI,
+        paymentHistory: Math.round(paymentHistory * 100),
+        missedPayments: applicantData?.credit?.payment_history?.missed_payments || 0,
         totalAssets: this.calculateAssetValue(applicantData),
         creditUtilization: Math.round(this.calculateCreditUtilization(applicantData) * 100),
         creditAge: this.calculateCreditAge(applicantData),
+        employmentType,
+        employer: applicantData?.income?.income_statement?.salary_slips?.employer,
+        itrFiled: applicantData?.income?.income_statement?.tax_returns?.itr_filed,
+        rentalIncome: applicantData?.income?.income_statement?.investment_portfolio?.real_estate_income?.monthly_rent || 0,
+        creditInquiries: applicantData?.credit?.credit_inquiries?.length || 0,
+        activeLoansCount: applicantData?.loan?.loan_repayment_history?.active_loans?.length || 0,
+        creditCardsCount: applicantData?.credit?.credit_cards?.length || 0,
         totalRiskFactors: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.riskFactors?.length || 0), 0),
         totalPositives: Object.values(this.analysisResults).reduce((sum, analysis) => sum + (analysis.positives?.length || 0), 0)
       },
@@ -538,51 +598,35 @@ IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
     const totalEMI = this.analysisResults.loan?.totalEMI || 0;
     const dtiRatio = monthlyIncome > 0 ? totalEMI / monthlyIncome : 0;
     const paymentHistory = applicantData?.credit?.payment_history?.on_time_payment_ratio || 0;
-    const assets = this.calculateAssetValue(applicantData);
     const utilization = this.calculateCreditUtilization(applicantData);
-    const creditAge = this.calculateCreditAge(applicantData);
-    const inquiries = applicantData?.credit?.credit_inquiries?.length || 0;
+    const employmentType = applicantData?.income?.income_statement?.salary_slips?.employment_type;
     
     let riskScore = 0;
     
-    // Credit Score Risk (25%)
-    if (creditScore < 580) riskScore += 25;
-    else if (creditScore < 670) riskScore += 20;
-    else if (creditScore < 740) riskScore += 10;
-    else if (creditScore < 800) riskScore += 5;
+    // Credit Score Risk (35%) - More balanced scoring
+    if (creditScore < 550) riskScore += 35;
+    else if (creditScore < 600) riskScore += 25;
+    else if (creditScore < 650) riskScore += 18;
+    else if (creditScore < 700) riskScore += 12;
+    else if (creditScore < 750) riskScore += 8;
+    else if (creditScore < 800) riskScore += 4;
     
-    // DTI Risk (20%)
-    if (dtiRatio > 0.6) riskScore += 20;
-    else if (dtiRatio > 0.5) riskScore += 15;
-    else if (dtiRatio > 0.4) riskScore += 10;
-    else if (dtiRatio > 0.3) riskScore += 5;
+    // DTI Risk (30%) - More realistic thresholds
+    if (dtiRatio > 0.6) riskScore += 30;
+    else if (dtiRatio > 0.5) riskScore += 20;
+    else if (dtiRatio > 0.4) riskScore += 12;
+    else if (dtiRatio > 0.35) riskScore += 6;
     
-    // Payment History Risk (20%)
-    if (paymentHistory < 0.7) riskScore += 20;
-    else if (paymentHistory < 0.8) riskScore += 15;
-    else if (paymentHistory < 0.9) riskScore += 10;
-    else if (paymentHistory < 0.95) riskScore += 5;
+    // Payment History Risk (25%) - Increased weight
+    if (paymentHistory < 0.7) riskScore += 25;
+    else if (paymentHistory < 0.8) riskScore += 18;
+    else if (paymentHistory < 0.9) riskScore += 12;
+    else if (paymentHistory < 0.95) riskScore += 6;
     
-    // Asset Security Risk (15%)
-    if (assets < 100000) riskScore += 15;
-    else if (assets < 500000) riskScore += 10;
-    else if (assets < 1000000) riskScore += 5;
-    
-    // Credit Utilization Risk (10%)
-    if (utilization > 0.9) riskScore += 10;
-    else if (utilization > 0.7) riskScore += 8;
-    else if (utilization > 0.5) riskScore += 5;
-    else if (utilization > 0.3) riskScore += 2;
-    
-    // Credit Age Risk (5%)
-    if (creditAge < 6) riskScore += 5;
-    else if (creditAge < 12) riskScore += 3;
-    else if (creditAge < 24) riskScore += 1;
-    
-    // Recent Inquiries Risk (5%)
-    if (inquiries > 6) riskScore += 5;
-    else if (inquiries > 3) riskScore += 3;
-    else if (inquiries > 1) riskScore += 1;
+    // Employment Stability Risk (10%)
+    if (employmentType === 'Contract' || employmentType === 'Self Employed') riskScore += 10;
+    else if (employmentType === 'Permanent') riskScore += 0;
+    else riskScore += 5; // Unknown employment type
     
     return Math.min(100, Math.max(0, riskScore));
   }
@@ -590,38 +634,42 @@ IMPROVEMENT_TIPS: [specific actionable advice if rejected in plain text]`;
   getPrimaryDecisionFactors(creditScore, dtiRatio, paymentHistory, applicantData) {
     const factors = [];
     const actualDTI = isNaN(dtiRatio) || dtiRatio === 0 ? 0 : dtiRatio;
-    const assets = this.calculateAssetValue(applicantData);
-    const utilization = this.calculateCreditUtilization(applicantData);
-    const creditAge = this.calculateCreditAge(applicantData);
+    const employmentType = applicantData?.income?.income_statement?.salary_slips?.employment_type;
     
+    // Always include credit score factor
     if (creditScore < 600) {
-      factors.push({ factor: 'Credit Score', impact: 'NEGATIVE', weight: 25, description: `Score of ${creditScore} is below minimum threshold of 600` });
+      factors.push({ factor: 'Credit Score', impact: 'NEGATIVE', weight: 35, description: `Score of ${creditScore} is below minimum threshold of 600` });
     } else if (creditScore >= 750) {
-      factors.push({ factor: 'Credit Score', impact: 'POSITIVE', weight: 25, description: `Excellent score of ${creditScore} indicates low default risk` });
+      factors.push({ factor: 'Credit Score', impact: 'POSITIVE', weight: 35, description: `Excellent score of ${creditScore} indicates low default risk` });
+    } else if (creditScore >= 650) {
+      factors.push({ factor: 'Credit Score', impact: 'POSITIVE', weight: 35, description: `Good score of ${creditScore} shows reliable credit management` });
     }
     
+    // Always include DTI factor
     if (actualDTI > 0.5) {
-      factors.push({ factor: 'Debt-to-Income', impact: 'NEGATIVE', weight: 20, description: `DTI of ${Math.round(actualDTI * 100)}% exceeds safe lending limit of 50%` });
+      factors.push({ factor: 'Debt-to-Income', impact: 'NEGATIVE', weight: 30, description: `DTI of ${Math.round(actualDTI * 100)}% exceeds safe lending limit of 50%` });
     } else if (actualDTI < 0.3 && actualDTI > 0) {
-      factors.push({ factor: 'Debt-to-Income', impact: 'POSITIVE', weight: 20, description: `Low DTI of ${Math.round(actualDTI * 100)}% shows strong repayment capacity` });
+      factors.push({ factor: 'Debt-to-Income', impact: 'POSITIVE', weight: 30, description: `Low DTI of ${Math.round(actualDTI * 100)}% shows strong repayment capacity` });
+    } else if (actualDTI <= 0.5 && actualDTI > 0) {
+      factors.push({ factor: 'Debt-to-Income', impact: 'POSITIVE', weight: 30, description: `Manageable DTI of ${Math.round(actualDTI * 100)}% within acceptable limits` });
     }
     
+    // Always include payment history factor
     if (paymentHistory < 0.8) {
-      factors.push({ factor: 'Payment History', impact: 'NEGATIVE', weight: 20, description: `Only ${Math.round(paymentHistory * 100)}% on-time payments indicates reliability concerns` });
+      factors.push({ factor: 'Payment History', impact: 'NEGATIVE', weight: 25, description: `Only ${Math.round(paymentHistory * 100)}% on-time payments indicates reliability concerns` });
     } else if (paymentHistory >= 0.95) {
-      factors.push({ factor: 'Payment History', impact: 'POSITIVE', weight: 20, description: `${Math.round(paymentHistory * 100)}% on-time payments shows excellent discipline` });
+      factors.push({ factor: 'Payment History', impact: 'POSITIVE', weight: 25, description: `${Math.round(paymentHistory * 100)}% on-time payments shows excellent discipline` });
+    } else {
+      factors.push({ factor: 'Payment History', impact: 'POSITIVE', weight: 25, description: `${Math.round(paymentHistory * 100)}% on-time payments shows good payment discipline` });
     }
     
-    if (assets > 1000000) {
-      factors.push({ factor: 'Asset Security', impact: 'POSITIVE', weight: 15, description: `Strong asset base of ₹${(assets/100000).toFixed(1)}L provides collateral security` });
-    } else if (assets < 200000) {
-      factors.push({ factor: 'Asset Security', impact: 'NEGATIVE', weight: 15, description: `Limited assets of ₹${(assets/100000).toFixed(1)}L reduce repayment security` });
-    }
-    
-    if (utilization > 0.8) {
-      factors.push({ factor: 'Credit Utilization', impact: 'NEGATIVE', weight: 10, description: `High utilization of ${Math.round(utilization * 100)}% indicates credit stress` });
-    } else if (utilization < 0.3) {
-      factors.push({ factor: 'Credit Utilization', impact: 'POSITIVE', weight: 10, description: `Low utilization of ${Math.round(utilization * 100)}% shows credit discipline` });
+    // Always include employment factor
+    if (employmentType === 'Permanent') {
+      factors.push({ factor: 'Employment Stability', impact: 'POSITIVE', weight: 10, description: `Permanent employment provides stable income source` });
+    } else if (employmentType === 'Contract') {
+      factors.push({ factor: 'Employment Stability', impact: 'NEGATIVE', weight: 10, description: `Contract employment may indicate income instability` });
+    } else if (employmentType === 'Self Employed') {
+      factors.push({ factor: 'Employment Stability', impact: 'NEGATIVE', weight: 10, description: `Self-employment income may be variable and unpredictable` });
     }
     
     return factors;

@@ -11,17 +11,55 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationContext, setConversationContext] = useState({});
   const messagesEndRef = useRef(null);
   const novaService = useRef(new AWSNovaService());
 
+  // Test connection immediately when chatbot opens
+  useEffect(() => {
+    if (isOpen) {
+      testConnection();
+    }
+  }, [isOpen]);
+
+  const testConnection = async () => {
+    if (!novaService.current.apiKey) {
+      novaService.current.connectionStatus = 'no-key';
+      return;
+    }
+    
+    try {
+      const response = await fetch('https://bedrock-runtime.us-east-1.amazonaws.com/model/amazon.nova-pro-v1:0/invoke', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${novaService.current.apiKey}`
+        },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: [{ text: 'hi' }] }],
+          inferenceConfig: { maxTokens: 5, temperature: 0.1 }
+        })
+      });
+      
+      if (response.ok) {
+        novaService.current.connectionStatus = 'connected';
+        novaService.current.showConnectionNotification();
+      } else {
+        novaService.current.connectionStatus = 'failed';
+      }
+    } catch (error) {
+      novaService.current.connectionStatus = 'failed';
+    }
+  };
+
   const suggestedQuestions = [
     "Why was this loan approved/rejected?",
-    "What are the main risk factors?",
-    "How can they improve their credit score?",
+    "What if my salary goes up by 20%?",
+    "If I reduce debt by ₹15,000, will I get approved?",
     "Is their DTI ratio concerning?",
-    "What's their repayment capacity?",
-    "How does their employment affect the decision?",
-    "What if they increase their income by 20%?",
+    "What happens to my DTI?",
+    "Will I still get the loan?",
+    "What if they increase their income by 25%?",
     "How would reducing debt by ₹10,000 help?",
     "What credit score do they need for approval?",
     "Can they get a co-signer to improve chances?"
@@ -33,6 +71,39 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
 
   const handleSendMessage = async (message) => {
     if (!message.trim()) return;
+
+    // Retry connection in background until successful
+    if (!novaService.current.connectionStatus || novaService.current.connectionStatus === 'failed') {
+      const botMessage = {
+        type: 'bot',
+        content: "🔄 Connecting to AI service...",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+      
+      // Retry up to 3 times
+      for (let i = 0; i < 3; i++) {
+        await testConnection();
+        if (novaService.current.connectionStatus === 'connected') {
+          break;
+        }
+        if (i < 2) await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s between retries
+      }
+      
+      if (novaService.current.connectionStatus !== 'connected') {
+        const errorMessage = {
+          type: 'bot',
+          content: "⚠️ Connection failed. Please try again.",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Remove connecting message and continue with actual request
+      setMessages(prev => prev.slice(0, -1));
+    }
 
     const userMessage = {
       type: 'user',
@@ -55,14 +126,51 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
         },
         financialInfo: {
           monthlyIncome: applicantData?.income?.income_statement?.salary_slips?.monthly_income,
+          netIncome: applicantData?.income?.income_statement?.salary_slips?.net_income,
           creditScore: applicantData?.credit?.credit_score?.score,
-          dtiRatio: analysisResults?.keyFactors?.dtiRatio,
+          creditRating: applicantData?.credit?.credit_score?.rating,
+          dtiRatio: (() => {
+            const monthlyIncome = applicantData?.income?.income_statement?.salary_slips?.monthly_income || 0;
+            const totalEMI = applicantData?.loan?.loan_repayment_history?.active_loans?.reduce((sum, loan) => sum + (loan.emi_amount || 0), 0) || 0;
+            const dtiRatio = monthlyIncome > 0 ? Math.round((totalEMI / monthlyIncome) * 100) : 0;
+            return dtiRatio;
+          })(),
           totalEMI: applicantData?.loan?.loan_repayment_history?.active_loans?.reduce((sum, loan) => sum + (loan.emi_amount || 0), 0),
           paymentHistory: applicantData?.credit?.payment_history?.on_time_payment_ratio,
-          creditUtilization: applicantData?.credit?.credit_cards?.[0]?.utilization_ratio,
+          missedPayments: applicantData?.credit?.payment_history?.missed_payments,
+          creditUtilization: (() => {
+            const cards = applicantData?.credit?.credit_cards || [];
+            if (cards.length === 0) return 0;
+            const totalUsed = cards.reduce((sum, card) => sum + ((card.limit || 0) * (card.utilization_ratio || 0)), 0);
+            const totalLimit = cards.reduce((sum, card) => sum + (card.limit || 0), 0);
+            return totalLimit > 0 ? totalUsed / totalLimit : 0;
+          })(),
           creditInquiries: applicantData?.credit?.credit_inquiries || [],
           activeLoans: applicantData?.loan?.loan_repayment_history?.active_loans || [],
-          creditCards: applicantData?.credit?.credit_cards || []
+          creditCards: applicantData?.credit?.credit_cards || [],
+          employmentType: applicantData?.income?.income_statement?.salary_slips?.employment_type,
+          employer: applicantData?.income?.income_statement?.salary_slips?.employer,
+          itrFiled: applicantData?.income?.income_statement?.tax_returns?.itr_filed,
+          totalAssets: (() => {
+            const investments = applicantData?.income?.income_statement?.investment_portfolio;
+            let total = 0;
+            if (investments?.mutual_funds) total += investments.mutual_funds.reduce((sum, fund) => sum + (fund.current_value || 0), 0);
+            if (investments?.fixed_deposits) total += investments.fixed_deposits.reduce((sum, fd) => sum + (fd.amount || 0), 0);
+            if (investments?.stocks) total += investments.stocks.reduce((sum, stock) => sum + ((stock.quantity || 0) * (stock.current_price || 0)), 0);
+            return total;
+          })(),
+          rentalIncome: applicantData?.income?.income_statement?.investment_portfolio?.real_estate_income?.monthly_rent || 0,
+          monthlySpending: applicantData?.transaction?.transaction_logs?.reduce((sum, txn) => sum + (txn.total_amount || 0), 0) || 0,
+          utilityPaymentDelays: (() => {
+            const utilities = applicantData?.transaction?.utility_payments?.monthly_breakdown || [];
+            let totalDelays = 0;
+            utilities.forEach(month => {
+              Object.values(month).forEach(utility => {
+                if (typeof utility === 'object' && utility.delay_days > 0) totalDelays++;
+              });
+            });
+            return totalDelays;
+          })()
         },
         loanDecision: {
           recommendation: analysisResults?.recommendation,
@@ -71,45 +179,53 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
         }
       };
 
-      const prompt = `You are a friendly AI loan advisor with explainable AI capabilities, chatting about ${context.personalInfo.name}'s loan application. 
+      // Check for scenario modifications in conversation context
+      const currentIncome = conversationContext.modifiedIncome || context.financialInfo.monthlyIncome;
+      const currentEMI = conversationContext.modifiedEMI || context.financialInfo.totalEMI;
+      const currentDTI = currentIncome > 0 ? Math.round((currentEMI / currentIncome) * 100) : 0;
+      const currentCreditScore = conversationContext.modifiedCreditScore || context.financialInfo.creditScore;
+      
+      // Detect scenario changes in current message
+      const incomeChangeMatch = message.match(/salary|income.*?(?:increase|goes?|rise).*?(\d+)%/i) || message.match(/(\d+)%.*?(?:increase|rise).*?(?:salary|income)/i);
+      const debtChangeMatch = message.match(/(?:reduce|pay.*?down|lower).*?debt.*?(\d+)/i) || message.match(/debt.*?(?:reduce|pay.*?down|lower).*?(\d+)/i);
+      const creditChangeMatch = message.match(/credit.*?score.*?(\d+)/i) || message.match(/(\d+).*?credit.*?score/i);
+      
+      if (incomeChangeMatch) {
+        const percentage = parseInt(incomeChangeMatch[1]);
+        const newIncome = Math.round(context.financialInfo.monthlyIncome * (1 + percentage/100));
+        setConversationContext(prev => ({...prev, modifiedIncome: newIncome, lastChange: `income increased by ${percentage}%`}));
+      }
+      
+      if (debtChangeMatch) {
+        const amount = parseInt(debtChangeMatch[1]);
+        const newEMI = Math.max(0, context.financialInfo.totalEMI - amount);
+        setConversationContext(prev => ({...prev, modifiedEMI: newEMI, lastChange: `debt reduced by ₹${amount}`}));
+      }
+      
+      if (creditChangeMatch) {
+        const newScore = parseInt(creditChangeMatch[1]);
+        setConversationContext(prev => ({...prev, modifiedCreditScore: newScore, lastChange: `credit score changed to ${newScore}`}));
+      }
+
+      const prompt = `You are a casual, friendly loan advisor chatting with ${context.personalInfo.name}. Talk naturally like a human conversation.
 
 KEY INFO:
-• ${context.personalInfo.name}, ${context.personalInfo.age} years old
-• Works as ${context.personalInfo.employment} (${context.personalInfo.employmentType})
-• Earns ₹${context.financialInfo.monthlyIncome?.toLocaleString()}/month
-• Credit Score: ${context.financialInfo.creditScore}
-• Current EMIs: ₹${context.financialInfo.totalEMI?.toLocaleString()} (${context.financialInfo.dtiRatio}% of income)
-• Payment History: ${(context.financialInfo.paymentHistory * 100).toFixed(1)}% on-time
-• Our Decision: ${context.loanDecision.recommendation}
-• Risk Score: ${context.loanDecision.riskScore}/100
+- Current income: Rs ${currentIncome?.toLocaleString()}
+- Monthly EMIs: Rs ${currentEMI?.toLocaleString()}
+- Credit score: ${currentCreditScore}
+- DTI: ${currentDTI}%
+- Status: ${(currentCreditScore >= 650 && currentDTI <= 40) ? 'APPROVED' : 'REJECTED'}
 
-DETAILED DATA ACCESS:
-• Credit Inquiries: ${context.financialInfo.creditInquiries.map(inq => `${inq.inquiry_type} by ${inq.inquirer} on ${inq.inquiry_date}`).join(', ')}
-• Active Loans: ${context.financialInfo.activeLoans.map(loan => `${loan.loan_type} - ₹${loan.emi_amount}/month`).join(', ')}
-• Credit Cards: ${context.financialInfo.creditCards.map(card => `${card.card_type} (${Math.round(card.utilization_ratio * 100)}% used)`).join(', ')}
+STYLE RULES:
+- Talk like texting a friend, not writing a report
+- NO mathematical formulas or brackets
+- Just say the numbers simply: "30,000 divided by 54,000 equals 56%"
+- Keep it short and conversational
+- Be encouraging and positive
 
-EXPLAINABILITY FEATURES:
-- Provide specific reasons for decisions with exact thresholds
-- Offer what-if scenarios when asked (e.g., "If credit score improves by X points...")
-- Give actionable improvement advice with timelines
-- Explain how each factor contributes to the final decision
-- Use transparency in all explanations
+Example good response: "Nice! If your salary goes up 20%, you'd earn Rs 54,000 instead of Rs 45,000. Your DTI would drop to 56% which is much better. You'd still need to get it under 40% for approval, but you're heading in the right direction!"
 
-CONDITIONAL APPROVAL GUIDELINES:
-- For credit scores 650-749: Loan amount up to 8x monthly income
-- Conditions: Maintain current payment record, provide guarantor if amount >₹5L
-- Interest rate: 12-15% based on final assessment
-
-QUESTION: "${message}"
-
-RESPOND LIKE AN EXPERT ADVISOR:
-- Be conversational but informative
-- Provide specific numbers and thresholds
-- Offer actionable insights
-- Use actual data from their profile
-- Keep response under 200 words
-- Include what-if scenarios when relevant
-- Explain the 'why' behind decisions clearly`;
+QUESTION: ${message}`;
 
       // Build conversation history for context
       const conversationHistory = messages.slice(-6).map(msg => ({
@@ -132,13 +248,13 @@ RESPOND LIKE AN EXPERT ADVISOR:
         body: JSON.stringify({
           messages: conversationHistory,
           inferenceConfig: {
-            maxTokens: 800,
-            temperature: 0.3
+            maxTokens: 150,
+            temperature: 0.2
           }
         })
       });
 
-      let botResponse = "I'm having trouble accessing the detailed analysis right now. Please try asking your question again.";
+      let botResponse = "Sorry, I'm having connection issues. Let me try to reconnect...";
 
       if (response.ok) {
         if (!novaService.current.connectionStatus) {

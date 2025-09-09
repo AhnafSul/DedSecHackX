@@ -3,7 +3,7 @@
     "active_loans": [
       {
         "loan_type": "Personal Loan",
-        "issuer": "Bajaj Finance",
+        "issuer": "JKL Finance",
         "loan_amount": 400000,
         "outstanding_amount": 380000,
         "emi_amount": 12000,
@@ -20,7 +20,7 @@
       },
       {
         "loan_type": "Business Loan",
-        "issuer": "HDFC Bank",
+        "issuer": "ABC Bank",
         "loan_amount": 800000,
         "outstanding_amount": 750000,
         "emi_amount": 18000,

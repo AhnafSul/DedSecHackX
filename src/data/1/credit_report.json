@@ -13,7 +13,7 @@
     },
     "credit_cards": [
       {
-        "issuer": "HDFC Bank",
+        "issuer": "ABC Bank",
         "card_type": "Platinum",
         "limit": 200000,
         "available_limit": 50000,
@@ -22,7 +22,7 @@
         "opened_on": "2020-03-10"
       },
       {
-        "issuer": "ICICI Bank",
+        "issuer": "XYZ Bank",
         "card_type": "Gold",
         "limit": 100000,
         "available_limit": 80000,
@@ -34,7 +34,7 @@
     "loans": [
       {
         "type": "Personal Loan",
-        "issuer": "Axis Bank",
+        "issuer": "PQR Bank",
         "amount": 500000,
         "outstanding": 120000,
         "tenure_months": 60,
@@ -44,7 +44,7 @@
       },
       {
         "type": "Home Loan",
-        "issuer": "SBI",
+        "issuer": "DEF Bank",
         "amount": 2500000,
         "outstanding": 1800000,
         "tenure_months": 240,
@@ -56,14 +56,14 @@
     "closed_accounts": [
       {
         "type": "Credit Card",
-        "issuer": "Kotak Mahindra Bank",
+        "issuer": "GHI Bank",
         "limit": 50000,
         "closed_on": "2023-04-10",
         "closure_reason": "Customer Request"
       },
       {
         "type": "Auto Loan",
-        "issuer": "Bajaj Finance",
+        "issuer": "JKL Finance",
         "amount": 300000,
         "closed_on": "2022-12-01",
         "closure_reason": "Loan Fully Paid"
@@ -72,13 +72,13 @@
     "credit_inquiries": [
       {
         "date": "2025-08-15",
-        "institution": "Bajaj Finance",
+        "institution": "JKL Finance",
         "purpose": "Two-Wheeler Loan",
         "type": "Hard Inquiry"
       },
       {
         "date": "2025-07-10",
-        "institution": "HDFC Bank",
+        "institution": "ABC Bank",
         "purpose": "Credit Card",
         "type": "Soft Inquiry"
       }

@@ -42,21 +42,21 @@
     "investment_portfolio": {
       "mutual_funds": [
         {
-          "fund_name": "HDFC Balanced Advantage Fund",
+          "fund_name": "ABC Balanced Advantage Fund",
           "current_value": 150000,
           "investment_type": "Equity"
         }
       ],
       "fixed_deposits": [
         {
-          "bank": "ICICI Bank",
+          "bank": "XYZ Bank",
           "amount": 100000,
           "maturity_date": "2026-03-15"
         }
       ],
       "stocks": [
         {
-          "company": "Infosys Ltd",
+          "company": "RST Technologies Ltd",
           "quantity": 50,
           "current_price": 1450
         }
