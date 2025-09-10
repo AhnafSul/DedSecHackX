@@ -528,31 +528,7 @@ const ExplainabilityPanel = ({ applicantData, analysisResults, isOpen, onClose }
                     </div>
                   )}
                   
-                  {/* SHAP Counterfactuals */}
-                  {simulationResults.shapCounterfactuals?.length > 0 && (
-                    <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
-                      <h4 className="font-semibold text-purple-900 mb-4">🔮 SHAP-Based What-If Scenarios</h4>
-                      <div className="space-y-3">
-                        {simulationResults.shapCounterfactuals.map((scenario, index) => (
-                          <div key={index} className="bg-white rounded-lg p-4 border border-purple-100">
-                            <div className="flex justify-between items-start mb-2">
-                              <h5 className="font-medium text-purple-900">{scenario.name}</h5>
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                scenario.impact > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                              }`}>
-                                {scenario.impact > 0 ? '-' : '+'}{Math.abs(scenario.impact).toFixed(1)} risk points
-                              </span>
-                            </div>
-                            <p className="text-sm text-purple-700 mb-2">{scenario.change}</p>
-                            <div className="flex justify-between text-xs text-gray-600">
-                              <span>Current Risk: {scenario.oldRisk.toFixed(1)}</span>
-                              <span>New Risk: {scenario.newRisk.toFixed(1)}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
                   
                   {/* Improvement Suggestions */}
                   {simulationResults.recommendation !== 'APPROVE' && simulationResults.improvementTips?.length > 0 && (
