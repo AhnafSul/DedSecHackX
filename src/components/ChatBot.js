@@ -81,13 +81,12 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
       };
       setMessages(prev => [...prev, botMessage]);
       
-      // Retry up to 3 times
-      for (let i = 0; i < 3; i++) {
+      // Quick retry without delays
+      for (let i = 0; i < 2; i++) {
         await testConnection();
         if (novaService.current.connectionStatus === 'connected') {
           break;
         }
-        if (i < 2) await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s between retries
       }
       
       if (novaService.current.connectionStatus !== 'connected') {
@@ -160,17 +159,54 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
             return total;
           })(),
           rentalIncome: applicantData?.income?.income_statement?.investment_portfolio?.real_estate_income?.monthly_rent || 0,
-          monthlySpending: applicantData?.transaction?.transaction_logs?.reduce((sum, txn) => sum + (txn.total_amount || 0), 0) || 0,
-          utilityPaymentDelays: (() => {
+          monthlySpending: (() => {
+            const income = applicantData?.income?.income_statement?.salary_slips?.monthly_income || 0;
+            const emi = applicantData?.loan?.loan_repayment_history?.active_loans?.reduce((sum, loan) => sum + (loan.emi_amount || 0), 0) || 0;
+            const availableForSpending = Math.max(0, income - emi);
+            const actualSpending = applicantData?.transaction?.transaction_logs?.reduce((sum, txn) => sum + (txn.total_amount || 0), 0) || 0;
+            // Use realistic spending (70% of available income after EMI)
+            return Math.min(actualSpending, Math.round(availableForSpending * 0.7));
+          })(),
+          spendingBreakdown: (() => {
+            const transactions = applicantData?.transaction?.transaction_logs || [];
+            const breakdown = {
+              'Groceries': 0,
+              'E-commerce': 0,
+              'Ride-Hailing': 0,
+              'Food Delivery': 0,
+              'Telecom': 0,
+              'Electricity': 0,
+              'Water': 0,
+              'Internet': 0
+            };
+            transactions.forEach(txn => {
+              const category = txn.category || txn.merchant;
+              breakdown[category] = (breakdown[category] || 0) + (txn.total_amount || 0);
+            });
+            return breakdown;
+          })(),
+          ecommerceSpending: applicantData?.transaction?.ecommerce_activity?.total_spent || 0,
+          rideDeliverySpending: (applicantData?.transaction?.ride_delivery_usage?.ride_hailing?.total_spent || 0) + (applicantData?.transaction?.ride_delivery_usage?.food_delivery?.total_spent || 0),
+          mobileAppSpending: applicantData?.transaction?.mobile_app_spending?.telecom_recharge?.total_spent || 0,
+          utilityPayments: (() => {
             const utilities = applicantData?.transaction?.utility_payments?.monthly_breakdown || [];
-            let totalDelays = 0;
+            let onTime = 0, delayed = 0, missed = 0;
             utilities.forEach(month => {
               Object.values(month).forEach(utility => {
-                if (typeof utility === 'object' && utility.delay_days > 0) totalDelays++;
+                if (typeof utility === 'object') {
+                  if (utility.missed_payment) missed++;
+                  else if (utility.delay_days > 0) delayed++;
+                  else onTime++;
+                }
               });
             });
-            return totalDelays;
-          })()
+            return { onTime, delayed, missed };
+          })(),
+          deductions: {
+            pf: applicantData?.income?.income_statement?.salary_slips?.deductions?.pf || 0,
+            tax: applicantData?.income?.income_statement?.salary_slips?.deductions?.tax || 0,
+            other: applicantData?.income?.income_statement?.salary_slips?.deductions?.other || 0
+          }
         },
         loanDecision: {
           recommendation: analysisResults?.recommendation,
@@ -207,36 +243,46 @@ const ChatBot = ({ applicantData, analysisResults, isOpen, onClose }) => {
         setConversationContext(prev => ({...prev, modifiedCreditScore: newScore, lastChange: `credit score changed to ${newScore}`}));
       }
 
-      const prompt = `You are a casual, friendly loan advisor chatting with ${context.personalInfo.name}. Talk naturally like a human conversation.
+      const prompt = `You are ${context.personalInfo.name}'s loan advisor. Give consistent, data-driven answers.
 
-KEY INFO:
-- Current income: Rs ${currentIncome?.toLocaleString()}
-- Monthly EMIs: Rs ${currentEMI?.toLocaleString()}
-- Credit score: ${currentCreditScore}
-- DTI: ${currentDTI}%
-- Status: ${(currentCreditScore >= 650 && currentDTI <= 40) ? 'APPROVED' : 'REJECTED'}
+COMPLETE PROFILE:
+PERSONAL: ${context.personalInfo.name}, Age ${context.personalInfo.age}, ${context.financialInfo.employmentType} at ${context.financialInfo.employer}
+FINANCIAL: Income Rs ${currentIncome?.toLocaleString()}, EMI Rs ${currentEMI?.toLocaleString()}, DTI ${currentDTI}%
+CREDIT: Score ${currentCreditScore} (${context.financialInfo.creditRating}), Payment History ${Math.round((context.financialInfo.paymentHistory || 0) * 100)}%, Missed ${context.financialInfo.missedPayments || 0} payments
+CARDS: ${context.financialInfo.creditCards?.length || 0} cards, ${Math.round((context.financialInfo.creditUtilization || 0) * 100)}% utilization
+LOANS: ${context.financialInfo.activeLoans?.length || 0} active loans
+ASSETS: Rs ${context.financialInfo.totalAssets?.toLocaleString() || 0} investments, Rs ${context.financialInfo.rentalIncome?.toLocaleString() || 0} rental
+SPENDING: Total Rs ${context.financialInfo.monthlySpending?.toLocaleString()}, Groceries Rs ${context.financialInfo.spendingBreakdown?.['Groceries'] || 0}, E-commerce Rs ${context.financialInfo.ecommerceSpending || 0}, Food Rs ${context.financialInfo.spendingBreakdown?.['Food Delivery'] || 0}, Ride Rs ${context.financialInfo.spendingBreakdown?.['Ride-Hailing'] || 0}, Utilities Rs ${(context.financialInfo.spendingBreakdown?.['Electricity'] || 0) + (context.financialInfo.spendingBreakdown?.['Water'] || 0) + (context.financialInfo.spendingBreakdown?.['Internet'] || 0)}
+UTILITIES: ${context.financialInfo.utilityPayments?.onTime || 0} on-time, ${context.financialInfo.utilityPayments?.delayed || 0} delayed
+DEDUCTIONS: PF Rs ${context.financialInfo.deductions?.pf || 0}, Tax Rs ${context.financialInfo.deductions?.tax || 0}
+STATUS: ${(currentCreditScore >= 650 && currentDTI <= 40) ? 'LOAN APPROVED' : 'LOAN REJECTED'}
 
-STYLE RULES:
-- Talk like texting a friend, not writing a report
-- NO mathematical formulas or brackets
-- Just say the numbers simply: "30,000 divided by 54,000 equals 56%"
-- Keep it short and conversational
-- Be encouraging and positive
-
-Example good response: "Nice! If your salary goes up 20%, you'd earn Rs 54,000 instead of Rs 45,000. Your DTI would drop to 56% which is much better. You'd still need to get it under 40% for approval, but you're heading in the right direction!"
+RULES:
+- Always refer to specific data from above
+- DTI = EMI ÷ Income only
+- Be consistent in calculations
+- Keep responses 2-3 sentences
+- Temperature 0.1 for consistency
 
 QUESTION: ${message}`;
 
       // Build conversation history for context
-      const conversationHistory = messages.slice(-6).map(msg => ({
+      const conversationHistory = messages.slice(-4).map(msg => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
         content: [{ text: msg.content }]
       }));
       
-      // Add current question with context
+      // Add previous context to current question
+      const lastUserMessage = messages.filter(m => m.type === 'user').slice(-1)[0];
+      const contextualPrompt = lastUserMessage ? 
+        `Previous question: "${lastUserMessage.content}"
+Current question: "${message}"
+
+${prompt}` : prompt;
+      
       conversationHistory.push({
         role: 'user',
-        content: [{ text: prompt }]
+        content: [{ text: contextualPrompt }]
       });
 
       const response = await fetch('https://bedrock-runtime.us-east-1.amazonaws.com/model/amazon.nova-pro-v1:0/invoke', {
@@ -248,8 +294,8 @@ QUESTION: ${message}`;
         body: JSON.stringify({
           messages: conversationHistory,
           inferenceConfig: {
-            maxTokens: 150,
-            temperature: 0.2
+            maxTokens: 130,
+            temperature: 0.1
           }
         })
       });
